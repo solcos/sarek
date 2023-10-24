@@ -1,9 +1,16 @@
+
+# Local
 *.code-workspace
 .nextflow*
 work/
 data/
 results/
 .DS_Store
+params.yaml
+script.sh
+log*
+
+# nf-core
 testing/
 testing*
 *.pyc

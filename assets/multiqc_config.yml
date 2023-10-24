@@ -25,6 +25,8 @@ run_modules:
   - samtools
   - mosdepth
   - gatk
+  - sexdeterrmine
+  - somalier
   - bcftools
   - vcftools
   - snpeff
@@ -46,6 +48,10 @@ module_order:
       name: "Mosdepth"
   - gatk:
       name: "GATK4 BQSR"
+  - sexdeterrmine:
+       name: "Sex.DetERRmine"
+   - somalier:
+       name: "Somalier"
   - bcftools:
       name: "Bcftools"
   - vcftools:

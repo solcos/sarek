@@ -46,6 +46,24 @@ def checkPathParamList = [
     params.known_indels_tbi,
     params.known_snps,
     params.known_snps_tbi,
+
+
+
+
+
+
+
+    
+
+    //params.somalier_sites,
+
+
+
+
+
+
+
+
     params.mappability,
     params.multiqc_config,
     params.pon,
@@ -449,6 +467,24 @@ include { BAM_BASERECALIBRATOR_SPARK                  } from '../subworkflows/lo
 include { BAM_APPLYBQSR                               } from '../subworkflows/local/bam_applybqsr/main'
 include { BAM_APPLYBQSR_SPARK                         } from '../subworkflows/local/bam_applybqsr_spark/main'
 
+
+
+
+
+
+
+// Sex determination
+include { CRAM_SEXDETERRMINE                          } from '../subworkflows/local/cram_bioqc_sex_deterrmine/main'
+
+// Somalier
+include { CRAM_SOMALIER                          } from '../subworkflows/local/cram_bioqc_somalier/main'
+
+
+
+
+
+
+
 // Variant calling on a single normal sample
 include { BAM_VARIANT_CALLING_GERMLINE_ALL            } from '../subworkflows/local/bam_variant_calling_germline_all/main'
 
@@ -491,6 +527,44 @@ workflow SAREK {
     reports  = Channel.empty()
     // To gather used softwares versions for MultiQC
     versions = Channel.empty()
+
+
+
+
+
+
+
+
+
+
+    // SOMALIER sites
+
+    // T2T
+    somalier_sites_t2t = "$projectDir/assets/sites/sites.chm13v2.T2T.vcf.gz"
+
+    // GRCh37
+    somalier_sites_grch37 = "$projectDir/assets/sites/sites.GRCh37.vcf.gz"
+
+    // HG19
+    somalier_sites_hg19 = "$projectDir/assets/sites/sites.hg19.vcf.gz"
+
+    // HG38 NO CHR
+    somalier_sites_hg38_nochr = "$projectDir/assets/sites/sites.hg38.nochr.vcf.gz"
+
+    // HG38
+    somalier_sites_hg38 = "$projectDir/assets/sites/sites.hg38.vcf.gz"
+    
+    // Set somalier sites
+    somalier_sites = params.fasta.contains('37') ? somalier_sites_grch37 : params.fasta.contains('38') ? somalier_sites_hg38 : params.fasta.toLowerCase().contains('t2t') ? somalier_sites_t2t : ""
+
+ 
+
+
+
+
+
+
+
 
     // Download cache if needed
     // Assuming that if the cache is provided, the user has already downloaded it
@@ -1058,6 +1132,48 @@ workflow SAREK {
             cram_variant_calling = Channel.empty().mix(ch_cram_for_bam_baserecalibrator)
         }
     }
+
+
+
+
+
+
+
+
+
+
+    // BIO-QC
+    if (!(params.skip_tools && params.skip_tools.split(',').contains('bioqc'))) {
+
+
+        // SEX DETERMINATION
+        CRAM_SEXDETERRMINE(cram_variant_calling, intervals_for_preprocessing)
+
+        // Gather QC reports
+        reports = reports.mix(CRAM_SEXDETERRMINE.out.reports.collect{ meta, report -> report })
+
+        // Gather used softwares versions
+        versions = versions.mix(CRAM_SEXDETERRMINE.out.versions)
+
+
+        // SOMALER
+        CRAM_SOMALIER(cram_variant_calling, fasta, fasta_fai, somalier_sites)
+
+        // Gather QC reports
+        reports = reports.mix(CRAM_SOMALIER.out.reports.collect{ meta, report -> report })
+
+        // Gather used softwares versions
+        versions = versions.mix(CRAM_SOMALIER.out.versions)
+    }
+
+
+
+
+
+
+
+
+
 
     if (params.step == 'variant_calling') {
 
