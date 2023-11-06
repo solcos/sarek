@@ -13,7 +13,7 @@ process SEXDETERRMINE {
 
     output:
     tuple val(meta), path("*.json"), emit: json
-    tuple val(meta), path("*_results_sex_deterrmine.tsv") , emit: tsv
+    tuple val(meta), path("*_results.tsv") , emit: tsv
     
     path "versions.yml"            , emit: versions
 
@@ -31,7 +31,7 @@ process SEXDETERRMINE {
         -I $depth \\
         -f $sample_list_file \\
         $args \\
-        > ${prefix}_results_sex_deterrmine.tsv
+        > ${prefix}_results.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

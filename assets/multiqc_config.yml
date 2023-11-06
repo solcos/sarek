@@ -50,7 +50,7 @@ module_order:
       name: "GATK4 BQSR"
   - sexdeterrmine:
        name: "Sex.DetERRmine"
-   - somalier:
+  - somalier:
        name: "Somalier"
   - bcftools:
       name: "Bcftools"

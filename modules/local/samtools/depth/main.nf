@@ -12,8 +12,8 @@ process SAMTOOLS_DEPTH {
     tuple val(meta2), path(intervals)
 
     output:
-    tuple val(meta1), path("*_modified_sex_deterrmine.tsv"), emit: tsv
-    tuple val(meta1), path("*_sample_list_sex_deterrmine.txt"), emit: txt
+    tuple val(meta1), path("*_modified_sexdeterrmine.tsv"), emit: tsv
+    tuple val(meta1), path("*_sample_sexdeterrmine.txt"), emit: txt
     path "versions.yml"           , emit: versions
 
     when:
@@ -34,8 +34,8 @@ process SAMTOOLS_DEPTH {
         $cram
 
     #  Modify output for SexDeterrmine
-    awk 'BEGIN {print "#Chr\tPos\t${prefix}"} {print}' ${prefix}.tsv > ${prefix}_modified_sex_deterrmine.tsv
-    echo "${prefix}" > ${prefix}_sample_list_sex_deterrmine.txt 
+    awk 'BEGIN {print "#Chr\tPos\t${prefix}"} {print}' ${prefix}.tsv > ${prefix}_modified_sexdeterrmine.tsv
+    echo "${prefix}" > ${prefix}_sample_sexdeterrmine.txt 
     rm -f ${prefix}.tsv
 
     cat <<-END_VERSIONS > versions.yml
