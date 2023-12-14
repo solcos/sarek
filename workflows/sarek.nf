@@ -63,7 +63,6 @@ def checkPathParamList = [
 
 
 
-
     params.mappability,
     params.multiqc_config,
     params.pon,
@@ -330,6 +329,33 @@ known_snps         = params.known_snps         ? Channel.fromPath(params.known_s
 mappability        = params.mappability        ? Channel.fromPath(params.mappability).collect()       : Channel.value([])
 pon                = params.pon                ? Channel.fromPath(params.pon).collect()               : Channel.value([]) // PON is optional for Mutect2 (but highly recommended)
 
+
+
+
+
+
+
+// IMPACT QC EXTERNAL FILES
+
+// PICARD INTERVALS
+params.bait_intervals      = ""
+bait_intervals             = params.bait_intervals     ? Channel.fromPath(params.bait_intervals).collect()     : Channel.empty()
+params.amplicon_intervals  = ""
+amplicon_intervals         = params.amplicon_intervals ? Channel.fromPath(params.amplicon_intervals).collect() : Channel.empty()
+params.target_intervals    = ""
+target_intervals           = params.target_intervals   ? Channel.fromPath(params.target_intervals).collect()   : Channel.empty()
+
+// SOMALIER
+somalier_sites             = params.somalier_sites     ? Channel.fromPath(params.somalier_sites).collect()     : Channel.empty()
+
+
+
+
+
+
+
+
+
 // Initialize value channels based on params, defined in the params.genomes[params.genome] scope
 ascat_genome       = params.ascat_genome       ?: Channel.empty()
 dbsnp_vqsr         = params.dbsnp_vqsr         ? Channel.value(params.dbsnp_vqsr) : Channel.empty()
@@ -473,11 +499,34 @@ include { BAM_APPLYBQSR_SPARK                         } from '../subworkflows/lo
 
 
 
+// QC
+// GATK4 Depth Of Coverage
+include { CRAM_GATK4_DEPTH_OF_COVERAGE                    } from '../subworkflows/impact_qc/cram_qc_gatk4_depth_of_coverage/main'
+
+// Convert CRAM file (before variant calling) to BAM file
+include { SAMTOOLS_CONVERT as CRAM_TO_BAM_IMPACT_QC       } from '../modules/nf-core/samtools/convert/main'
+
+// PICARD Collect Insert Size Metrics
+include { BAM_PICARD_COLLECT_INSERT_SIZE_METRICS          } from '../subworkflows/impact_qc/bam_qc_picard_collect_insert_size_metrics/main'
+
+// PICARD Collect Hs Metrics
+include { BAM_PICARD_COLLECTHSMETRICS                     } from '../subworkflows/impact_qc/bam_qc_picard_collecthsmetrics/main'
+
+// PICARD Collect Targeted Pcr Metrics
+include { BAM_PICARD_COLLECTTARGETEDPCRMETRICS                     } from '../subworkflows/impact_qc/bam_qc_picard_collecttargetedpcrmetrics/main'
+
+// PICARD Collect Alignment Summary Metrics
+include { BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS                     } from '../subworkflows/impact_qc/bam_qc_picard_collectalignmentsummarymetrics/main'
+
+// BIO QC
 // Sex determination
-include { CRAM_SEXDETERRMINE                          } from '../subworkflows/local/cram_bioqc_sex_deterrmine/main'
+include { CRAM_SEXDETERRMINE                              } from '../subworkflows/impact_qc/cram_bioqc_sex_deterrmine/main'
 
 // Somalier
-include { CRAM_SOMALIER                          } from '../subworkflows/local/cram_bioqc_somalier/main'
+include { CRAM_SOMALIER                                   } from '../subworkflows/impact_qc/cram_bioqc_somalier/main'
+
+
+
 
 
 
@@ -527,44 +576,6 @@ workflow SAREK {
     reports  = Channel.empty()
     // To gather used softwares versions for MultiQC
     versions = Channel.empty()
-
-
-
-
-
-
-
-
-
-
-    // SOMALIER sites
-
-    // T2T
-    somalier_sites_t2t = "$projectDir/assets/sites/sites.chm13v2.T2T.vcf.gz"
-
-    // GRCh37
-    somalier_sites_grch37 = "$projectDir/assets/sites/sites.GRCh37.vcf.gz"
-
-    // HG19
-    somalier_sites_hg19 = "$projectDir/assets/sites/sites.hg19.vcf.gz"
-
-    // HG38 NO CHR
-    somalier_sites_hg38_nochr = "$projectDir/assets/sites/sites.hg38.nochr.vcf.gz"
-
-    // HG38
-    somalier_sites_hg38 = "$projectDir/assets/sites/sites.hg38.vcf.gz"
-    
-    // Set somalier sites
-    somalier_sites = params.fasta.contains('37') ? somalier_sites_grch37 : params.fasta.contains('38') ? somalier_sites_hg38 : params.fasta.toLowerCase().contains('t2t') ? somalier_sites_t2t : ""
-
- 
-
-
-
-
-
-
-
 
     // Download cache if needed
     // Assuming that if the cache is provided, the user has already downloaded it
@@ -1142,29 +1153,123 @@ workflow SAREK {
 
 
 
-    // BIO-QC
-    if (!(params.skip_tools && params.skip_tools.split(',').contains('bioqc'))) {
 
 
-        // SEX DETERMINATION
-        CRAM_SEXDETERRMINE(cram_variant_calling, intervals_for_preprocessing)
+    // IMPACT QC
 
-        // Gather QC reports
-        reports = reports.mix(CRAM_SEXDETERRMINE.out.reports.collect{ meta, report -> report })
+    if (!(params.skip_tools && params.skip_tools.split(',').contains('impactqc'))) {
 
-        // Gather used softwares versions
-        versions = versions.mix(CRAM_SEXDETERRMINE.out.versions)
-
-
-        // SOMALER
-        CRAM_SOMALIER(cram_variant_calling, fasta, fasta_fai, somalier_sites)
+        // GATK4 Depth Of Coverage
+        CRAM_GATK4_DEPTH_OF_COVERAGE(cram_variant_calling, intervals_bed_combined, dict, fasta, fasta_fai)
 
         // Gather QC reports
-        reports = reports.mix(CRAM_SOMALIER.out.reports.collect{ meta, report -> report })
+        reports = reports.mix(CRAM_GATK4_DEPTH_OF_COVERAGE.out.reports.collect{ meta, report -> report })
 
         // Gather used softwares versions
-        versions = versions.mix(CRAM_SOMALIER.out.versions)
+        versions = versions.mix(CRAM_GATK4_DEPTH_OF_COVERAGE.out.versions)
+       
+
+        // PICARD Collect Insert Size Metrics
+       
+        // Convert last CRAM file to BAM to used it in CollectInsertSizeMetrics
+        CRAM_TO_BAM_IMPACT_QC(cram_variant_calling, fasta, fasta_fai)
+        bam_impact_qc = Channel.empty()
+        bam_impact_qc = CRAM_TO_BAM_IMPACT_QC.out.alignment_index
+            // Make sure correct data types are carried through
+            .map{ meta, bam, bai -> [ meta + [data_type: "bam"], bam, bai ] }
+        
+        //params.save_output_as_bam ? CHANNEL_ALIGN_CREATE_CSV(BAM_MERGE_INDEX_SAMTOOLS.out.bam_bai) : CHANNEL_ALIGN_CREATE_CSV(CRAM_TO_BAM_IMPACT_QC.out.alignment_index)
+
+        versions = versions.mix(CRAM_TO_BAM_IMPACT_QC.out.versions)
+
+        BAM_PICARD_COLLECT_INSERT_SIZE_METRICS(bam_impact_qc)
+
+        // Gather QC reports
+        reports = reports.mix(BAM_PICARD_COLLECT_INSERT_SIZE_METRICS.out.reports.collect{ meta, report -> report })
+
+        // Gather used softwares versions
+        versions = versions.mix(BAM_PICARD_COLLECT_INSERT_SIZE_METRICS.out.versions)
+
+        // PICARD CollectHsMetrics
+        if (!(params.skip_tools && params.skip_tools.split(',').contains('collecthsmetrics'))) {
+        
+            // Combine "bam_impact_qc" with target/bait intervals for CollectHsMetrics
+            //bam_collecthsmetrics = bam_impact_qc.map{ meta, bam, bai, bait_intervals, target_intervals, table -> [ meta, bam, bai, bait_intervals, target_intervals ] }
+            //bam_collecthsmetrics = bam_impact_qc.combine(bait_intervals, target_intervals)
+            //BAM_PICARD_COLLECTHSMETRICS(bam_collecthsmetrics, fasta, fasta_fai, dict)
+
+            //BAM_PICARD_COLLECTHSMETRICS(bam_impact_qc, bait_intervals, target_intervals, fasta, fasta_fai, dict)
+  
+            BAM_PICARD_COLLECTHSMETRICS(bam_impact_qc, bait_intervals, target_intervals, fasta, fasta_fai)
+
+            // Gather QC reports
+            reports = reports.mix(BAM_PICARD_COLLECTHSMETRICS.out.reports.collect{ meta, report -> report })
+
+            // Gather used softwares versions
+            versions = versions.mix(BAM_PICARD_COLLECTHSMETRICS.out.versions)
+        }
+
+        // PICARD CollectTargetedPcrMetrics
+        if (!(params.skip_tools && params.skip_tools.split(',').contains('collecttargetedpcrmetrics'))) {
+        
+            // Combine "bam_impact_qc" with target/amplicon intervals for CollectTargetedPcrMetrics
+            //bam_collecttargetedpcrmetrics = bam_impact_qc.map{ meta, bam, bai, amplicon_intervals, target_intervals, table -> [ meta, bam, bai, amplicon_intervals, target_intervals ] } 
+            //bam_collecttargetpcrmetrics = bam_impact_qc.combine(amplicon_intervals, target_intervals)
+            //BAM_PICARD_COLLECTTARGETEDPCRMETRICS(bam_collecttargetedpcrmetrics, fasta, fasta_fai, dict)
+ 
+            //BAM_PICARD_COLLECTTARGETEDPCRMETRICS(bam_impact_qc, amplicon_intervals, target_intervals, fasta, fasta_fai, dict)
+            
+            BAM_PICARD_COLLECTTARGETEDPCRMETRICS(bam_impact_qc, amplicon_intervals, target_intervals, fasta, fasta_fai)
+
+            // Gather QC reports
+            reports = reports.mix(BAM_PICARD_COLLECTTARGETEDPCRMETRICS.out.reports.collect{ meta, report -> report })
+
+            // Gather used softwares versions
+            versions = versions.mix(BAM_PICARD_COLLECTTARGETEDPCRMETRICS.out.versions)
+
+        }
+
+        // PICARD CollectAlignmentSummaryMetrics
+        if (!(params.skip_tools && params.skip_tools.split(',').contains('collectalignmentsummarymetrics'))) {
+
+            //BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS(bam_impact_qc, fasta, fasta_fai, dict)
+
+            BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS(bam_impact_qc, fasta, fasta_fai)
+
+            // Gather QC reports
+            reports = reports.mix(BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS.out.reports.collect{ meta, report -> report })
+
+            // Gather used softwares versions
+            versions = versions.mix(BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS.out.versions)
+
+        }
+
+        // BIO-QC
+        if (!(params.skip_tools && params.skip_tools.split(',').contains('bioqc'))) {
+
+
+            // SEX DETERMINATION
+            CRAM_SEXDETERRMINE(cram_variant_calling, intervals_for_preprocessing)
+
+            // Gather QC reports
+            reports = reports.mix(CRAM_SEXDETERRMINE.out.reports.collect{ meta, report -> report })
+
+            // Gather used softwares versions
+            versions = versions.mix(CRAM_SEXDETERRMINE.out.versions)
+
+            // SOMALER
+            CRAM_SOMALIER(cram_variant_calling, fasta, fasta_fai, somalier_sites)
+
+            // Gather QC reports
+            reports = reports.mix(CRAM_SOMALIER.out.reports.collect{ meta, report -> report })
+
+            // Gather used softwares versions
+            versions = versions.mix(CRAM_SOMALIER.out.versions)
+        }
     }
+
+
+
 
 
 

@@ -4,8 +4,8 @@
 // For all modules here:
 // A when clause condition is defined in the conf/modules.config to determine if the module should be run
 
-include { SAMTOOLS_DEPTH } from '../../../modules/local/samtools/depth/main'
-include { SEXDETERRMINE } from '../../../modules/local/sexdeterrmine/main'
+include { SAMTOOLS_DEPTH } from '../../../modules/impact_qc/samtools/depth/main'
+include { SEXDETERRMINE } from '../../../modules/impact_qc/sexdeterrmine/main'
 
 workflow CRAM_SEXDETERRMINE {
     take:

@@ -60,6 +60,16 @@ params.vep_cache_version     = WorkflowMain.getGenomeAttribute(params, 'vep_cach
 params.vep_genome            = WorkflowMain.getGenomeAttribute(params, 'vep_genome')
 params.vep_species           = WorkflowMain.getGenomeAttribute(params, 'vep_species')
 
+
+
+
+params.somalier_sites        = WorkflowMain.getGenomeAttribute(params, 'somalier_sites')
+
+
+
+
+
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ALTERNATIVE INPUT FILE ON RESTART
