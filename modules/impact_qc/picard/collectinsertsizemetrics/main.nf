@@ -8,7 +8,7 @@ process PICARD_COLLECT_INSERT_SIZE_METRICS {
         'biocontainers/picard:3.1.1--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(bam)
+    tuple val(meta), path(bam), path(bai)
 
     output:
     tuple val(meta), path("*.txt"), emit: metrics
