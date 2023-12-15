@@ -1,21 +1,17 @@
-process PICARD_COLLECTALIGNMENTSUMMARYMETRICS {
+process COLLECTALIGNMENTSUMMARYMETRICS {
     tag "$meta.id"
-    label 'process_single'
+    label 'process_medium'
 
-    conda "${moduleDir}/environment.yml"
+    conda "bioconda::gatk4=4.4.0.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/picard:3.1.1--hdfd78af_0' :
-        'biocontainers/picard:3.1.1--hdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/gatk4:4.4.0.0--py36hdfd78af_0':
+        'biocontainers/gatk4:4.4.0.0--py36hdfd78af_0' }"
 
     input:
     tuple val(meta), path(bam), path(bai)
-    //tuple val(meta2), path(fasta)
-    //tuple val(meta3), path(fai)
-    //tuple val(meta4), path(dict)
     path fasta
     path fai
-    //path dict
-
+  
     output:
     tuple val(meta), path("*txt")  , emit: metrics
     path "versions.yml"                 , emit: versions
@@ -36,8 +32,7 @@ process PICARD_COLLECTALIGNMENTSUMMARYMETRICS {
     }
 
     """
-    picard \\
-        -Xmx${avail_mem}M \\
+    gatk --java-options "-Xmx${avail_mem}M -XX:-UsePerfData" \\
         CollectAlignmentSummaryMetrics \\
         $args \\
         $reference \\
@@ -47,7 +42,7 @@ process PICARD_COLLECTALIGNMENTSUMMARYMETRICS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        picard: \$(echo \$(picard CollectAlignmentSummaryMetrics --version 2>&1) | grep -o 'Version:.*' | cut -f2- -d:)
+        gatk4: \$(echo \$(gatk --version 2>&1) | sed 's/^.*(GATK) v//; s/ .*\$//')
     END_VERSIONS
     """
 
@@ -58,7 +53,7 @@ process PICARD_COLLECTALIGNMENTSUMMARYMETRICS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        picard: \$(echo \$(picard CollectAligmentSummaryMetrics --version 2>&1) | grep -o 'Version:.*' | cut -f2- -d:)
+        gatk4: \$(echo \$(gatk --version 2>&1) | sed 's/^.*(GATK) v//; s/ .*\$//')
     END_VERSIONS
     """
 }

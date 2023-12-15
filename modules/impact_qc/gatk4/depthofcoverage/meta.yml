@@ -1,4 +1,4 @@
-name: gatk4_depthofcoverage
+name: depthofcoverage
 description: Assess sequence coverage by a wide array of metrics, partitioned by sample, read group, or library
 keywords:
   - bam

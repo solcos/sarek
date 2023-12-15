@@ -1,18 +1,13 @@
-process PICARD_COLLECTHSMETRICS {
+process COLLECTHSMETRICS {
     tag "$meta.id"
-    label 'process_single'
+    label 'process_medium'
 
-    conda "${moduleDir}/environment.yml"
+    conda "bioconda::gatk4=4.4.0.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/picard:3.1.1--hdfd78af_0' :
-        'biocontainers/picard:3.1.1--hdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/gatk4:4.4.0.0--py36hdfd78af_0':
+        'biocontainers/gatk4:4.4.0.0--py36hdfd78af_0' }"
 
     input:
-    //tuple val(meta), path(bam), path(bai), path(bait_intervals), path(target_intervals)
-    //tuple val(meta2), path(fasta)
-    //tuple val(meta3), path(fai)
-    //tuple val(meta4), path(dict)
-    
     tuple val(meta), path(bam), path(bai)
     path bait_intervals
     path target_intervals
@@ -34,26 +29,10 @@ process PICARD_COLLECTHSMETRICS {
 
     def avail_mem = 3072
     if (!task.memory) {
-        log.info '[Picard CollectHsMetrics] Available memory not known - defaulting to 3GB. Specify process memory requirements to change this.'
+        log.info '[GATK CollectHsMetrics] Available memory not known - defaulting to 3GB. Specify process memory requirements to change this.'
     } else {
         avail_mem = (task.memory.mega*0.8).intValue()
     }
-
-    /*
-    def bait_interval_list = bait_intervals
-    def bait_intervallist_cmd = ""
-    if (bait_intervals =~ /.(bed|bed.gz)$/){
-        bait_interval_list = bait_intervals.toString().replaceAll(/.(bed|bed.gz)$/, ".interval_list")
-        bait_intervallist_cmd = "picard -Xmx${avail_mem}M  BedToIntervalList --INPUT ${bait_intervals} --OUTPUT ${bait_interval_list} --SEQUENCE_DICTIONARY ${dict} --TMP_DIR ."
-    }
-
-    def target_interval_list = target_intervals
-    def target_intervallist_cmd = ""
-    if (target_intervals =~ /.(bed|bed.gz)$/){
-        target_interval_list = target_intervals.toString().replaceAll(/.(bed|bed.gz)$/, ".interval_list")
-        target_intervallist_cmd = "picard -Xmx${avail_mem}M  BedToIntervalList --INPUT ${target_intervals} --OUTPUT ${target_interval_list} --SEQUENCE_DICTIONARY ${dict} --TMP_DIR ."
-    }
-    */
 
     def bait_interval_list = bait_intervals
     def bait_intervallist_cmd = ""
@@ -69,14 +48,12 @@ process PICARD_COLLECTHSMETRICS {
         target_intervallist_cmd = "picard -Xmx${avail_mem}M  BedToIntervalList --INPUT ${target_intervals} --OUTPUT ${target_interval_list} --TMP_DIR ."
     }
 
-
     """
 
     $bait_intervallist_cmd
     $target_intervallist_cmd
 
-    picard \\
-        -Xmx${avail_mem}M \\
+    gatk --java-options "-Xmx${avail_mem}M -XX:-UsePerfData" \\
         CollectHsMetrics \\
         $args \\
         $reference \\
@@ -88,7 +65,7 @@ process PICARD_COLLECTHSMETRICS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        picard: \$(echo \$(picard CollectHsMetrics --version 2>&1) | grep -o 'Version:.*' | cut -f2- -d:)
+        gatk4: \$(echo \$(gatk --version 2>&1) | sed 's/^.*(GATK) v//; s/ .*\$//') 
     END_VERSIONS
     """
 
@@ -99,7 +76,7 @@ process PICARD_COLLECTHSMETRICS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        picard: \$(echo \$(picard CollectHsMetrics --version 2>&1) | grep -o 'Version:.*' | cut -f2- -d:)
+        gatk4: \$(echo \$(gatk --version 2>&1) | sed 's/^.*(GATK) v//; s/ .*\$//')
     END_VERSIONS
     """
 }

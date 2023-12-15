@@ -1,4 +1,4 @@
-process GATK4_DEPTH_OF_COVERAGE {
+process DEPTHOFCOVERAGE {
     tag "$meta.id"
     label 'process_low'
 
@@ -18,7 +18,7 @@ process GATK4_DEPTH_OF_COVERAGE {
     output:
     //tuple val(meta), path("*.bam") , emit: bam,  optional: true
     //tuple val(meta), path("*.cram"), emit: cram, optional: true
-    tuple val(meta), path("*gatk4_depth_of_coverage*"), emit: depth_of_coverage_output //per_locus_coverage          
+    tuple val(meta), path("*depthofcoverage*"), emit: depthofcoverage_output //per_locus_coverage          
     //tuple val(meta), path("*_summary"), emit: summary
     //tuple val(meta), path("*_statistics"), emit: statistics
     //tuple val(meta), path("*_interval_summary"), emit: interval_summary          

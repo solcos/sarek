@@ -41,7 +41,7 @@ module_order:
       name: "FastP (Read preprocessing)"
   - picard:
       name: "GATK4 MarkDuplicates, CollectInsertSizeMetrics, HsMetrics and AlignmentSummaryMetrics"
-      info: "metrics generated either by GATK4 MarkDuplicates or EstimateLibraryComplexity (with --use_gatk_spark), GATK4 CollectInsertSizeMetrics, HsMetrics and AlignmentSummaryMetrics"
+      info: "Metrics generated either by GATK4 MarkDuplicates or EstimateLibraryComplexity (with --use_gatk_spark), GATK4 CollectInsertSizeMetrics, HsMetrics and AlignmentSummaryMetrics"
   - samtools:
       name: "Samtools Flagstat"
   - mosdepth:

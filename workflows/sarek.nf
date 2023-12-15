@@ -500,30 +500,30 @@ include { BAM_APPLYBQSR_SPARK                         } from '../subworkflows/lo
 
 
 // QC
-// GATK4 Depth Of Coverage
-include { CRAM_GATK4_DEPTH_OF_COVERAGE                    } from '../subworkflows/impact_qc/cram_qc_gatk4_depth_of_coverage/main'
+// Depth Of Coverage
+include { CRAM_DEPTHOFCOVERAGE                            } from '../subworkflows/impact_qc/cram_depthofcoverage/main'
 
 // Convert CRAM file (before variant calling) to BAM file
-include { SAMTOOLS_CONVERT as CRAM_TO_BAM_IMPACT_QC       } from '../modules/nf-core/samtools/convert/main'
+include { SAMTOOLS_CONVERT as CRAM_TO_BAM_IMPACT_QC         } from '../modules/nf-core/samtools/convert/main'
 
-// PICARD Collect Insert Size Metrics
-include { BAM_PICARD_COLLECT_INSERT_SIZE_METRICS          } from '../subworkflows/impact_qc/bam_qc_picard_collect_insert_size_metrics/main'
+// Collect Insert Size Metrics
+include { BAM_COLLECTINSERTSIZEMETRICS                      } from '../subworkflows/impact_qc/bam_collectinsertsizemetrics/main'
 
-// PICARD Collect Hs Metrics
-include { BAM_PICARD_COLLECTHSMETRICS                     } from '../subworkflows/impact_qc/bam_qc_picard_collecthsmetrics/main'
+// Collect Hs Metrics
+include { BAM_COLLECTHSMETRICS                              } from '../subworkflows/impact_qc/bam_collecthsmetrics/main'
 
-// PICARD Collect Targeted Pcr Metrics
-include { BAM_PICARD_COLLECTTARGETEDPCRMETRICS                     } from '../subworkflows/impact_qc/bam_qc_picard_collecttargetedpcrmetrics/main'
+// Collect Targeted Pcr Metrics
+include { BAM_COLLECTTARGETEDPCRMETRICS                     } from '../subworkflows/impact_qc/bam_collecttargetedpcrmetrics/main'
 
-// PICARD Collect Alignment Summary Metrics
-include { BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS                     } from '../subworkflows/impact_qc/bam_qc_picard_collectalignmentsummarymetrics/main'
+// Collect Alignment Summary Metrics
+include { BAM_COLLECTALIGNMENTSUMMARYMETRICS                } from '../subworkflows/impact_qc/bam_collectalignmentsummarymetrics/main'
 
 // BIO QC
 // Sex determination
-include { CRAM_SEXDETERRMINE                              } from '../subworkflows/impact_qc/cram_bioqc_sex_deterrmine/main'
+include { CRAM_SEXDETERRMINE                                } from '../subworkflows/impact_qc/cram_sexdeterrmine/main'
 
 // Somalier
-include { CRAM_SOMALIER                                   } from '../subworkflows/impact_qc/cram_bioqc_somalier/main'
+include { CRAM_SOMALIER                                     } from '../subworkflows/impact_qc/cram_somalier/main'
 
 
 
@@ -1159,88 +1159,73 @@ workflow SAREK {
 
     if (!(params.skip_tools && params.skip_tools.split(',').contains('impactqc'))) {
 
-        // GATK4 Depth Of Coverage
-        CRAM_GATK4_DEPTH_OF_COVERAGE(cram_variant_calling, intervals_bed_combined, dict, fasta, fasta_fai)
+        // Depth Of Coverage
+        if (!(params.skip_tools && params.skip_tools.split(',').contains('depthofcoverage'))) {
+            CRAM_DEPTHOFCOVERAGE(cram_variant_calling, intervals_bed_combined, dict, fasta, fasta_fai)
 
-        // Gather QC reports
-        reports = reports.mix(CRAM_GATK4_DEPTH_OF_COVERAGE.out.reports.collect{ meta, report -> report })
+            // Gather QC reports
+            reports = reports.mix(CRAM_DEPTHOFCOVERAGE.out.reports.collect{ meta, report -> report })
 
-        // Gather used softwares versions
-        versions = versions.mix(CRAM_GATK4_DEPTH_OF_COVERAGE.out.versions)
-       
+            // Gather used softwares versions
+            versions = versions.mix(CRAM_DEPTHOFCOVERAGE.out.versions)
+        }
 
-        // PICARD Collect Insert Size Metrics
-       
-        // Convert last CRAM file to BAM to used it in CollectInsertSizeMetrics
-        CRAM_TO_BAM_IMPACT_QC(cram_variant_calling, fasta, fasta_fai)
-        bam_impact_qc = Channel.empty()
-        bam_impact_qc = CRAM_TO_BAM_IMPACT_QC.out.alignment_index
-            // Make sure correct data types are carried through
-            .map{ meta, bam, bai -> [ meta + [data_type: "bam"], bam, bai ] }
+        // Collect Insert Size Metrics
+        if (!(params.skip_tools && params.skip_tools.split(',').contains('collecinsertsizemetrics'))) {
+
+            // Convert last CRAM file to BAM to used it in CollectInsertSizeMetrics
+            CRAM_TO_BAM_IMPACT_QC(cram_variant_calling, fasta, fasta_fai)
+            bam_impact_qc = Channel.empty()
+            bam_impact_qc = CRAM_TO_BAM_IMPACT_QC.out.alignment_index
+                // Make sure correct data types are carried through
+                .map{ meta, bam, bai -> [ meta + [data_type: "bam"], bam, bai ] }
         
-        //params.save_output_as_bam ? CHANNEL_ALIGN_CREATE_CSV(BAM_MERGE_INDEX_SAMTOOLS.out.bam_bai) : CHANNEL_ALIGN_CREATE_CSV(CRAM_TO_BAM_IMPACT_QC.out.alignment_index)
+            versions = versions.mix(CRAM_TO_BAM_IMPACT_QC.out.versions)
 
-        versions = versions.mix(CRAM_TO_BAM_IMPACT_QC.out.versions)
+            BAM_COLLECTINSERTSIZEMETRICS(bam_impact_qc)
 
-        BAM_PICARD_COLLECT_INSERT_SIZE_METRICS(bam_impact_qc)
+            // Gather QC reports
+            reports = reports.mix(BAM_COLLECTINSERTSIZEMETRICS.out.reports.collect{ meta, report -> report })
 
-        // Gather QC reports
-        reports = reports.mix(BAM_PICARD_COLLECT_INSERT_SIZE_METRICS.out.reports.collect{ meta, report -> report })
+            // Gather used softwares versions
+            versions = versions.mix(BAM_COLLECTINSERTSIZEMETRICS.out.versions)
+        }
 
-        // Gather used softwares versions
-        versions = versions.mix(BAM_PICARD_COLLECT_INSERT_SIZE_METRICS.out.versions)
-
-        // PICARD CollectHsMetrics
+        // CollectHsMetrics
         if (!(params.skip_tools && params.skip_tools.split(',').contains('collecthsmetrics'))) {
-        
-            // Combine "bam_impact_qc" with target/bait intervals for CollectHsMetrics
-            //bam_collecthsmetrics = bam_impact_qc.map{ meta, bam, bai, bait_intervals, target_intervals, table -> [ meta, bam, bai, bait_intervals, target_intervals ] }
-            //bam_collecthsmetrics = bam_impact_qc.combine(bait_intervals, target_intervals)
-            //BAM_PICARD_COLLECTHSMETRICS(bam_collecthsmetrics, fasta, fasta_fai, dict)
-
-            //BAM_PICARD_COLLECTHSMETRICS(bam_impact_qc, bait_intervals, target_intervals, fasta, fasta_fai, dict)
-  
-            BAM_PICARD_COLLECTHSMETRICS(bam_impact_qc, bait_intervals, target_intervals, fasta, fasta_fai)
+       
+            BAM_COLLECTHSMETRICS(bam_impact_qc, bait_intervals, target_intervals, fasta, fasta_fai)
 
             // Gather QC reports
-            reports = reports.mix(BAM_PICARD_COLLECTHSMETRICS.out.reports.collect{ meta, report -> report })
+            reports = reports.mix(BAM_COLLECTHSMETRICS.out.reports.collect{ meta, report -> report })
 
             // Gather used softwares versions
-            versions = versions.mix(BAM_PICARD_COLLECTHSMETRICS.out.versions)
+            versions = versions.mix(BAM_COLLECTHSMETRICS.out.versions)
         }
 
-        // PICARD CollectTargetedPcrMetrics
+        // CollectTargetedPcrMetrics
         if (!(params.skip_tools && params.skip_tools.split(',').contains('collecttargetedpcrmetrics'))) {
-        
-            // Combine "bam_impact_qc" with target/amplicon intervals for CollectTargetedPcrMetrics
-            //bam_collecttargetedpcrmetrics = bam_impact_qc.map{ meta, bam, bai, amplicon_intervals, target_intervals, table -> [ meta, bam, bai, amplicon_intervals, target_intervals ] } 
-            //bam_collecttargetpcrmetrics = bam_impact_qc.combine(amplicon_intervals, target_intervals)
-            //BAM_PICARD_COLLECTTARGETEDPCRMETRICS(bam_collecttargetedpcrmetrics, fasta, fasta_fai, dict)
- 
-            //BAM_PICARD_COLLECTTARGETEDPCRMETRICS(bam_impact_qc, amplicon_intervals, target_intervals, fasta, fasta_fai, dict)
-            
-            BAM_PICARD_COLLECTTARGETEDPCRMETRICS(bam_impact_qc, amplicon_intervals, target_intervals, fasta, fasta_fai)
+         
+            BAM_COLLECTTARGETEDPCRMETRICS(bam_impact_qc, amplicon_intervals, target_intervals, fasta, fasta_fai)
 
             // Gather QC reports
-            reports = reports.mix(BAM_PICARD_COLLECTTARGETEDPCRMETRICS.out.reports.collect{ meta, report -> report })
+            reports = reports.mix(BAM_COLLECTTARGETEDPCRMETRICS.out.reports.collect{ meta, report -> report })
 
             // Gather used softwares versions
-            versions = versions.mix(BAM_PICARD_COLLECTTARGETEDPCRMETRICS.out.versions)
+            versions = versions.mix(BAM_COLLECTTARGETEDPCRMETRICS.out.versions)
 
         }
 
-        // PICARD CollectAlignmentSummaryMetrics
+        // CollectAlignmentSummaryMetrics
         if (!(params.skip_tools && params.skip_tools.split(',').contains('collectalignmentsummarymetrics'))) {
 
-            //BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS(bam_impact_qc, fasta, fasta_fai, dict)
-
-            BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS(bam_impact_qc, fasta, fasta_fai)
+            BAM_COLLECTALIGNMENTSUMMARYMETRICS(bam_impact_qc, fasta, fasta_fai)
 
             // Gather QC reports
-            reports = reports.mix(BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS.out.reports.collect{ meta, report -> report })
+            reports = reports.mix(BAM_COLLECTALIGNMENTSUMMARYMETRICS.out.reports.collect{ meta, report -> report })
 
             // Gather used softwares versions
-            versions = versions.mix(BAM_PICARD_COLLECTALIGNMENTSUMMARYMETRICS.out.versions)
+            versions = versions.mix(BAM_COLLECTALIGNMENTSUMMARYMETRICS.out.versions)
 
         }
 
@@ -1249,22 +1234,28 @@ workflow SAREK {
 
 
             // SEX DETERMINATION
-            CRAM_SEXDETERRMINE(cram_variant_calling, intervals_for_preprocessing)
+            if (!(params.skip_tools && params.skip_tools.split(',').contains('sexdeterrmine'))) {
 
-            // Gather QC reports
-            reports = reports.mix(CRAM_SEXDETERRMINE.out.reports.collect{ meta, report -> report })
+                CRAM_SEXDETERRMINE(cram_variant_calling, intervals_for_preprocessing)
 
-            // Gather used softwares versions
-            versions = versions.mix(CRAM_SEXDETERRMINE.out.versions)
+                // Gather QC reports
+                reports = reports.mix(CRAM_SEXDETERRMINE.out.reports.collect{ meta, report -> report })
 
-            // SOMALER
-            CRAM_SOMALIER(cram_variant_calling, fasta, fasta_fai, somalier_sites)
+                // Gather used softwares versions
+                versions = versions.mix(CRAM_SEXDETERRMINE.out.versions)
+            }
 
-            // Gather QC reports
-            reports = reports.mix(CRAM_SOMALIER.out.reports.collect{ meta, report -> report })
+            // SOMALIER
+            if (!(params.skip_tools && params.skip_tools.split(',').contains('somalier'))) {
 
-            // Gather used softwares versions
-            versions = versions.mix(CRAM_SOMALIER.out.versions)
+                CRAM_SOMALIER(cram_variant_calling, fasta, fasta_fai, somalier_sites)
+
+                // Gather QC reports
+                reports = reports.mix(CRAM_SOMALIER.out.reports.collect{ meta, report -> report })
+
+                // Gather used softwares versions
+                versions = versions.mix(CRAM_SOMALIER.out.versions)
+            }
         }
     }
 
