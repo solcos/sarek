@@ -1,6 +1,7 @@
 
 # Local
 *.code-workspace
+<<<<<<< HEAD
 .nextflow*
 work/
 data/
@@ -13,5 +14,16 @@ log*
 # nf-core
 testing/
 testing*
+=======
+>>>>>>> upstream/master
 *.pyc
+.nextflow*
+.DS_Store
+.nf-test*
+.nf-test/
+data/
+testing*
+testing/
 test-datasets/
+results/
+work/
