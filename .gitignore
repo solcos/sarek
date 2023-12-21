@@ -1,21 +1,6 @@
 
-# Local
-*.code-workspace
-<<<<<<< HEAD
-.nextflow*
-work/
-data/
-results/
-.DS_Store
-params.yaml
-script.sh
-log*
-
 # nf-core
-testing/
-testing*
-=======
->>>>>>> upstream/master
+*.code-workspace
 *.pyc
 .nextflow*
 .DS_Store
@@ -27,3 +12,8 @@ testing/
 test-datasets/
 results/
 work/
+
+# Local
+params.yaml
+script.sh
+log*
