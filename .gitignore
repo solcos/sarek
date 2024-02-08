@@ -17,3 +17,4 @@ work/
 params.yaml
 script.sh
 log*
+assets/fastq_screen_conf_db/Human/

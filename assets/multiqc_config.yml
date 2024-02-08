@@ -27,6 +27,7 @@ run_modules:
   - gatk
   - sexdeterrmine
   - somalier
+  - fastq_screen
   - bcftools
   - vcftools
   - snpeff
@@ -39,8 +40,10 @@ module_order:
         - "*_val_*.zip"
   - fastp:
       name: "FastP (Read preprocessing)"
+  - fastq_screen:
+       name: "FastQ Screen"
   - picard:
-      name: "GATK4 MarkDuplicates, CollectInsertSizeMetrics, HsMetrics and AlignmentSummaryMetrics"
+      name: "GATK-PICARD tools"
       info: "Metrics generated either by GATK4 MarkDuplicates or EstimateLibraryComplexity (with --use_gatk_spark), GATK4 CollectInsertSizeMetrics, HsMetrics and AlignmentSummaryMetrics"
   - samtools:
       name: "Samtools Flagstat"

@@ -17,6 +17,8 @@ workflow CRAM_SOMALIER {
     versions = Channel.empty()
     reports  = Channel.empty()
 
+    if ( true ) { println "[SOMALIER] warning: Somalier only accepts the correct complementary sites file as input. Somalier only works with reference genomes from the next list [GATK.GRCh37, Ensembl.GRCh37, GATK.GRCh38, NCBI.GRCh38, hg38, hg19]. Please check that the sites files correspond to the same reference genome input if needed. To specify the correct sites file you can provide one by changing any config that customises the path using or changing: params.somalier_sites / --somalier_sites. You can find the sites files in 'assets/sites/' directory." }
+
     // RUN SOMALIER
     SOMALIER(cram, fasta, fasta_fai, sites)
 

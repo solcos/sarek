@@ -135,7 +135,9 @@ target_intervals           = params.target_intervals   ? Channel.fromPath(params
 // SOMALIER
 somalier_sites             = params.somalier_sites     ? Channel.fromPath(params.somalier_sites).collect()     : Channel.empty()
 
-
+// FASTQ_SCREEN
+params.fastq_screen_conf_db      = "${projectDir}/assets/fastq_screen_conf_db/**"
+fastq_screen_conf_db      = params.fastq_screen_conf_db ? Channel.fromPath(params.fastq_screen_conf_db).collect()     : Channel.empty()
 
 
 
@@ -276,7 +278,8 @@ include { CRAM_SEXDETERRMINE                                } from '../subworkfl
 // Somalier
 include { CRAM_SOMALIER                                     } from '../subworkflows/impact_qc/cram_somalier/main'
 
-
+// Somalier
+include { FASTQ_FASTQSCREEN                                 } from '../subworkflows/impact_qc/fastq_fastqscreen/main'
 
 
 
@@ -1031,6 +1034,18 @@ workflow SAREK {
 
                 // Gather used softwares versions
                 versions = versions.mix(CRAM_SOMALIER.out.versions)
+            }
+
+            // FASTQ_SCREEN
+            if (!(params.skip_tools && params.skip_tools.split(',').contains('fastqscreen'))) {
+            
+                FASTQ_FASTQSCREEN(reads_for_alignment, fastq_screen_conf_db)
+
+                // Gather QC reports
+                reports = reports.mix(FASTQ_FASTQSCREEN.out.reports.collect{ meta, report -> report })
+
+                // Gather used softwares versions
+                versions = versions.mix(FASTQ_FASTQSCREEN.out.versions)
             }
         }
     }

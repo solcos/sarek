@@ -23,8 +23,6 @@ process COLLECTTARGETEDPCRMETRICS {
 
     script:
 
-    if ( true ) { println "[GATK CollectTargetedPcrMetrics] warning: PICARD CollectTargetedPcrMetrics needs the intervals files for --amplicon_intervals and --target_intervals, (One or more genomic intervals over which to operate). Also, this tool will not be processed by MultiQC." }
-
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def reference = fasta ? "--REFERENCE_SEQUENCE ${fasta}" : ""

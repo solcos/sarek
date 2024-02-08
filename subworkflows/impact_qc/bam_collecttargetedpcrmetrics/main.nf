@@ -18,6 +18,8 @@ workflow BAM_COLLECTTARGETEDPCRMETRICS {
     versions = Channel.empty()
     reports  = Channel.empty()
 
+    if ( true ) { println "[GATK CollectTargetedPcrMetrics] warning: PICARD CollectTargetedPcrMetrics needs the intervals files for --amplicon_intervals and --target_intervals, (One or more genomic intervals over which to operate). Also, this tool will not be processed by MultiQC." }
+
     // RUN COLLECT TARGETED PCR METRICS
     COLLECTTARGETEDPCRMETRICS(input, amplicon_intervals, target_intervals, fasta, fasta_fai)
 

@@ -37,9 +37,7 @@ process DEPTHOFCOVERAGE {
     def prefix = task.ext.prefix ?: "${meta.id}"
     //def interval_command = intervals ? "--intervals $intervals" : ""
 
-    if ( true ) { println "[GATK4 DepthOfCoverage] warning: GATK4 DepthOfCoverage needs the intervals file (One or more genomic intervals over which to operate) (--intervals). Also, this tool will not be processed by MultiQC." }
-
-   def avail_mem = 3072
+    def avail_mem = 3072
     if (!task.memory) {
         log.info '[GATK4 DepthOfCoverage] Available memory not known - defaulting to 3GB. Specify process memory requirements to change this.'
     } else {

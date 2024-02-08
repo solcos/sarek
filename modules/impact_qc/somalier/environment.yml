@@ -1,0 +1,7 @@
+name: somalier
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bioconda::somalier=0.2.18-0
