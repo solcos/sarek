@@ -1,4 +1,4 @@
-iname: samtools_depth
+name: samtools_depth
 description: Computes the depth at each position or region.
 keywords:
   - depth

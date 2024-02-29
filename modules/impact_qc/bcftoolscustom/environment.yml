@@ -1,7 +1,7 @@
-name: gatk4_depthofcoverage
+name: hethomratio 
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - bioconda::gatk4=4.4.0.0
+  - bioconda::bcftools=1.17

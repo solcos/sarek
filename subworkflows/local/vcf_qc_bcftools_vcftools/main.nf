@@ -3,6 +3,9 @@ include { VCFTOOLS as VCFTOOLS_SUMMARY    } from '../../../modules/nf-core/vcfto
 include { VCFTOOLS as VCFTOOLS_TSTV_COUNT } from '../../../modules/nf-core/vcftools/main'
 include { VCFTOOLS as VCFTOOLS_TSTV_QUAL  } from '../../../modules/nf-core/vcftools/main'
 
+include { VCFTOOLS as VCFTOOLS_FORMAT     } from '../../../modules/nf-core/vcftools/main'
+include { VCFTOOLS as VCFTOOLS_INFO       } from '../../../modules/nf-core/vcftools/main'
+
 workflow VCF_QC_BCFTOOLS_VCFTOOLS {
     take:
     vcf
@@ -17,6 +20,9 @@ workflow VCF_QC_BCFTOOLS_VCFTOOLS {
     VCFTOOLS_TSTV_QUAL(vcf, target_bed, [])
     VCFTOOLS_SUMMARY(vcf, target_bed, [])
 
+    VCFTOOLS_FORMAT(vcf, target_bed, [])
+    VCFTOOLS_INFO(vcf, target_bed, [])
+    
     versions = versions.mix(BCFTOOLS_STATS.out.versions)
     versions = versions.mix(VCFTOOLS_TSTV_COUNT.out.versions)
 
@@ -25,6 +31,9 @@ workflow VCF_QC_BCFTOOLS_VCFTOOLS {
     vcftools_tstv_counts    = VCFTOOLS_TSTV_COUNT.out.tstv_count
     vcftools_tstv_qual      = VCFTOOLS_TSTV_QUAL.out.tstv_qual
     vcftools_filter_summary = VCFTOOLS_SUMMARY.out.filter_summary
+
+    vcftools_format         = VCFTOOLS_FORMAT.out.format
+    vcftools_info           = VCFTOOLS_INFO.out.info
 
     versions
 }

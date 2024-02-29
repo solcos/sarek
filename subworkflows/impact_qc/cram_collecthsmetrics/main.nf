@@ -6,20 +6,23 @@
 
 include { COLLECTHSMETRICS } from '../../../modules/impact_qc/gatk4/collecthsmetrics/main'
 
-workflow BAM_COLLECTHSMETRICS {
+workflow CRAM_COLLECTHSMETRICS {
     take:
-    input                    // channel: [mandatory] [ meta, bam, bai, bait_intervals, target_intervals ]
+    input                    // channel: [mandatory] [ meta, cram, crai ]
     bait_intervals
     target_intervals
     fasta
     fasta_fai
+    dict
 
     main:
     versions = Channel.empty()
     reports  = Channel.empty()
 
+    if ( true ) { println "[GATK CollectHsMetrics] warning: PICARD CollectHsMetrics needs the intervals files for --bait_intervals and --target_intervals, (One or more genomic intervals over which to operate)." }
+
     // RUN COLLECT HS METRICS
-    COLLECTHSMETRICS(input, bait_intervals, target_intervals, fasta, fasta_fai)
+    COLLECTHSMETRICS(input, bait_intervals, target_intervals, fasta, fasta_fai, dict)
 
     // Gather all reports generated
     reports = reports.mix(COLLECTHSMETRICS.out.metrics)

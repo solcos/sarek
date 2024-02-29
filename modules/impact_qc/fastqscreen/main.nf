@@ -56,7 +56,7 @@ process FASTQSCREEN {
             
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
-            fastq_screen: \$(fastq_screen --version 2>&1 | sed -e "s/FastQ Screen //g")
+            fastq_screen: \$(fastq_screen --version 2>&1 | sed -e "s/FastQ Screen //g" | cut -c2-)
         END_VERSIONS
         """
     } else { 
@@ -91,7 +91,7 @@ process FASTQSCREEN {
  
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
-            fastq_sceen: \$(fastq_screen --version 2>&1 | sed -e "s/FastQ Screen //g")
+            fastq_sceen: \$(fastq_screen --version 2>&1 | sed -e "s/FastQ Screen //g" | cut -c2-)
         END_VERSIONS
         """
     }

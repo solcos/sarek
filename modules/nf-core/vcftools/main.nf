@@ -79,6 +79,7 @@ process VCFTOOLS {
     tuple val(meta), path("*.diff.indv")              , optional:true, emit: diff_indv
     tuple val(meta), path("*.diff.discordance.matrix"), optional:true, emit: diff_discd_matrix
     tuple val(meta), path("*.diff.switch")            , optional:true, emit: diff_switch_error
+
     path "versions.yml"                               , emit: versions
 
     when:
@@ -114,6 +115,16 @@ process VCFTOOLS {
         ${args_list.join(' ')} \\
         $bed_arg \\
         $diff_variant_arg
+
+    vcftools \\
+        $input_file \\
+        --out $prefix \\
+        --extract-FORMAT-info GQ
+    
+    vcftools \\
+        $input_file \\
+        --out $prefix \\
+        --get-INFO AF --get-INFO FS
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

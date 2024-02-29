@@ -28,8 +28,7 @@ workflow CRAM_SOMALIER {
     // Gather versions of all tools used 
     versions = versions.mix(SOMALIER.out.versions)
 
-    emit:
-    //tsv
+    emit: 
     reports
 
     versions    // channel: [ versions.yml ]

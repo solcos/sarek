@@ -33,6 +33,7 @@ process BCFTOOLS_STATS {
     """
     bcftools stats \\
         $args \\
+        -s - \\
         $regions_file \\
         $targets_file \\
         $samples_file \\

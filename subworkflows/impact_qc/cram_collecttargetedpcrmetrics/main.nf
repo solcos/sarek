@@ -6,13 +6,14 @@
 
 include { COLLECTTARGETEDPCRMETRICS } from '../../../modules/impact_qc/gatk4/collecttargetedpcrmetrics/main'
 
-workflow BAM_COLLECTTARGETEDPCRMETRICS {
+workflow CRAM_COLLECTTARGETEDPCRMETRICS {
     take:
-    input                    // channel: [mandatory] [ meta, bam, bai, amplicon_intervals, target_intervals ]
+    input                    // channel: [mandatory] [ meta, cram, crai ]
     amplicon_intervals
     target_intervals
     fasta
     fasta_fai
+    dict
 
     main:
     versions = Channel.empty()
@@ -21,7 +22,7 @@ workflow BAM_COLLECTTARGETEDPCRMETRICS {
     if ( true ) { println "[GATK CollectTargetedPcrMetrics] warning: PICARD CollectTargetedPcrMetrics needs the intervals files for --amplicon_intervals and --target_intervals, (One or more genomic intervals over which to operate). Also, this tool will not be processed by MultiQC." }
 
     // RUN COLLECT TARGETED PCR METRICS
-    COLLECTTARGETEDPCRMETRICS(input, amplicon_intervals, target_intervals, fasta, fasta_fai)
+    COLLECTTARGETEDPCRMETRICS(input, amplicon_intervals, target_intervals, fasta, fasta_fai, dict)
 
     // Gather all reports generated
     reports = reports.mix(COLLECTTARGETEDPCRMETRICS.out.metrics)

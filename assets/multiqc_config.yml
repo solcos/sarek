@@ -104,6 +104,16 @@ custom_data:
         description: "PERCENT_DUPLICATION"
       ESTIMATED_LIBRARY_SIZE:
         description: "ESTIMATED_LIBRARY_SIZE"
+
+mosdepth_config:
+  general_stats_coverage:
+    - 1
+    - 8
+    - 10
+    - 20
+    - 30
+    - 100
+
 sp:
   snpeff:
     contents: "SnpEff_version"

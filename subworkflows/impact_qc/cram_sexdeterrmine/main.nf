@@ -31,7 +31,7 @@ workflow CRAM_SEXDETERRMINE {
     versions = versions.mix(SEXDETERRMINE.out.versions)
 
     emit:
-    cram
+    //cram
     reports
 
     versions    // channel: [ versions.yml ]

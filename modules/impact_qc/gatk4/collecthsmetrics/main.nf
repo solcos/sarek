@@ -2,18 +2,18 @@ process COLLECTHSMETRICS {
     tag "$meta.id"
     label 'process_medium'
 
-    conda "bioconda::gatk4=4.4.0.0"
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/gatk4:4.4.0.0--py36hdfd78af_0':
         'biocontainers/gatk4:4.4.0.0--py36hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(bam), path(bai)
+    tuple val(meta), path(cram), path(crai)
     path bait_intervals
     path target_intervals
     path fasta
     path fai
-    //path dict
+    path dict
 
     output:
     tuple val(meta), path("*_metrics")  , emit: metrics
@@ -38,18 +38,17 @@ process COLLECTHSMETRICS {
     def bait_intervallist_cmd = ""
     if (bait_intervals =~ /.(bed|bed.gz)$/){
         bait_interval_list = bait_intervals.toString().replaceAll(/.(bed|bed.gz)$/, ".interval_list")
-        bait_intervallist_cmd = "picard -Xmx${avail_mem}M  BedToIntervalList --INPUT ${bait_intervals} --OUTPUT ${bait_interval_list} --TMP_DIR ."
+        bait_intervallist_cmd = "gatk --java-options -Xmx${avail_mem}M  BedToIntervalList --INPUT ${bait_intervals} --OUTPUT ${bait_interval_list} --SEQUENCE_DICTIONARY ${dict} --TMP_DIR ."
     }
 
     def target_interval_list = target_intervals
     def target_intervallist_cmd = ""
     if (target_intervals =~ /.(bed|bed.gz)$/){
         target_interval_list = target_intervals.toString().replaceAll(/.(bed|bed.gz)$/, ".interval_list")
-        target_intervallist_cmd = "picard -Xmx${avail_mem}M  BedToIntervalList --INPUT ${target_intervals} --OUTPUT ${target_interval_list} --TMP_DIR ."
+        target_intervallist_cmd = "gatk --java-options -Xmx${avail_mem}M  BedToIntervalList --INPUT ${target_intervals} --OUTPUT ${target_interval_list} --SEQUENCE_DICTIONARY ${dict} --TMP_DIR ."
     }
 
     """
-
     $bait_intervallist_cmd
     $target_intervallist_cmd
 
@@ -59,7 +58,7 @@ process COLLECTHSMETRICS {
         $reference \\
         --BAIT_INTERVALS $bait_interval_list \\
         --TARGET_INTERVALS $target_interval_list \\
-        --INPUT $bam \\
+        --INPUT $cram \\
         --OUTPUT ${prefix}.CollectHsMetrics.coverage_metrics
 
 
@@ -70,7 +69,8 @@ process COLLECTHSMETRICS {
     """
 
     stub:
-    //def prefix = task.ext.prefix ?: "${meta.id}"
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    
     """
     touch ${prefix}.CollectHsMetrics.coverage_metrics
 
