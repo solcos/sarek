@@ -13,7 +13,7 @@ process COLLECTTARGETEDPCRMETRICS {
     path target_intervals
     path fasta
     path fai
-    path dict
+    tuple val(meta2), path(dict)
 
     output:
     tuple val(meta), path("*_metrics")  , emit: metrics
