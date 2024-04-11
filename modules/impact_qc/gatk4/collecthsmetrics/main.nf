@@ -13,7 +13,7 @@ process COLLECTHSMETRICS {
     path target_intervals
     path fasta
     path fai
-    tuple val(meta2), path(dict)
+    path dict
 
     output:
     tuple val(meta), path("*_metrics")  , emit: metrics

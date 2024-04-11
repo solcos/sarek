@@ -1,20 +1,3 @@
-# ![nf-core/sarek](docs/images/impact_data_logo_pink_horitzontal.png)
-
-[![IMPaCT](https://img.shields.io/badge/Web%20-IMPaCT-1d355c.svg?labelColor=000000)](https://impact.isciii.es/)
-[![IMPaCT-isciii](https://img.shields.io/badge/Web%20-IMPaCT--isciii-1d355c.svg?labelColor=000000)](https://www.isciii.es/QueHacemos/Financiacion/IMPaCT/Paginas/default.aspx)
-[![IMPaCT-Data](https://img.shields.io/badge/Web%20-IMPaCT--Data-1d355c.svg?labelColor=000000)](https://impact-data.bsc.es/)
-
-## Introduction project
-
-IMPaCT-Data is the IMPaCT program that aims to support the development of a common, interoperable and integrated system for the collection and analysis of clinical and molecular data by providing the knowledge and resources available in the Spanish Science and Technology System. This development will make it possible to answer research questions based on the different clinical and molecular information systems available. Fundamentally, it aims to provide researchers with a population perspective based on individual data.
-
-The IMPaCT-Data project is divided into different work packages (WP). In the context of IMPaCT-Data WP3 (Genomics), a working group of experts worked on the generation of a specific quality control (QC) workflow for germline exome samples.
-
-To achieve this, a set of metrics related to human genomic data was decided upon, and the toolset or software to extract these metrics was implemented in an existing variant calling workflow called Sarek, part of the nf-core community.
-
-Below you can find the explanation of this workflow and a linked documentation associated to the QC metrics added in the mentioned workflow.
-
-
 # ![nf-core/sarek](docs/images/nf-core-sarek_logo_light.png#gh-light-mode-only) ![nf-core/sarek](docs/images/nf-core-sarek_logo_dark.png#gh-dark-mode-only)
 
 [![GitHub Actions CI Status](https://github.com/nf-core/sarek/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/sarek/actions?query=workflow%3A%22nf-core+CI%22)

@@ -1206,12 +1206,12 @@ workflow SAREK {
             // Gather used softwares versions
             versions = versions.mix(BAM_COLLECTINSERTSIZEMETRICS.out.versions)
         }
-        
+
         // CollectHsMetrics
         if (!(params.skip_tools && params.skip_tools.split(',').contains('collecthsmetrics'))) {
-                   
-            CRAM_COLLECTHSMETRICS(cram_variant_calling, bait_intervals, target_intervals, fasta, fasta_fai, dict)
        
+            CRAM_COLLECTHSMETRICS(cram_variant_calling, bait_intervals, target_intervals, fasta, fasta_fai, dict.collect{ it[1] })            
+            
             // Gather QC reports
             reports = reports.mix(CRAM_COLLECTHSMETRICS.out.reports.collect{ meta, report -> report })
 
@@ -1222,9 +1222,9 @@ workflow SAREK {
 
         // CollectTargetedPcrMetrics
         if (!(params.skip_tools && params.skip_tools.split(',').contains('collecttargetedpcrmetrics'))) {
-             
-            CRAM_COLLECTTARGETEDPCRMETRICS(cram_variant_calling, amplicon_intervals, target_intervals, fasta, fasta_fai, dict)
-            
+         
+            CRAM_COLLECTTARGETEDPCRMETRICS(cram_variant_calling, amplicon_intervals, target_intervals, fasta, fasta_fai, dict.collect{ it[1] })
+
             // Gather QC reports
             reports = reports.mix(CRAM_COLLECTTARGETEDPCRMETRICS.out.reports.collect{ meta, report -> report })
 
@@ -1232,7 +1232,7 @@ workflow SAREK {
             versions = versions.mix(CRAM_COLLECTTARGETEDPCRMETRICS.out.versions)
 
         }
-        
+
         // Samtools flagstat
         if (!(params.skip_tools && params.skip_tools.split(',').contains('flagstat'))) {
 
