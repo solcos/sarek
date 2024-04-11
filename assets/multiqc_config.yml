@@ -25,9 +25,6 @@ run_modules:
   - samtools
   - mosdepth
   - gatk
-  - sexdeterrmine
-  - somalier
-  - fastq_screen
   - bcftools
   - vcftools
   - snpeff
@@ -40,8 +37,6 @@ module_order:
         - "*_val_*.zip"
   - fastp:
       name: "FastP (Read preprocessing)"
-  - fastq_screen:
-       name: "FastQ Screen"
   - picard:
       name: "GATK-PICARD tools"
       info: "Metrics generated either by GATK4 MarkDuplicates or EstimateLibraryComplexity (with --use_gatk_spark), GATK4 CollectInsertSizeMetrics, HsMetrics and AlignmentSummaryMetrics"
@@ -51,10 +46,6 @@ module_order:
       name: "Mosdepth"
   - gatk:
       name: "GATK4 BQSR"
-  - sexdeterrmine:
-       name: "Sex.DetERRmine"
-  - somalier:
-       name: "Somalier"
   - bcftools:
       name: "Bcftools"
   - vcftools:
@@ -104,15 +95,6 @@ custom_data:
         description: "PERCENT_DUPLICATION"
       ESTIMATED_LIBRARY_SIZE:
         description: "ESTIMATED_LIBRARY_SIZE"
-
-mosdepth_config:
-  general_stats_coverage:
-    - 1
-    - 8
-    - 10
-    - 20
-    - 30
-    - 100
 
 sp:
   snpeff:
