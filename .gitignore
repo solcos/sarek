@@ -17,4 +17,5 @@ work/
 params.yaml
 script.sh
 log*
-assets/fastq_screen_conf_db/Human/
+impact_qc/assets/fastq_screen_conf_db/Human/
+impact_qc/assets/fastq_screen_conf_db/Mouse/
