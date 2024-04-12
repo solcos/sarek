@@ -1,4 +1,4 @@
-# ![IMPaCT](impact_qc/docs/logos/impact_data_logo_pink_horitzontal.png)
+# ![IMPaCT program](impact_qc/docs/logos/impact_data_logo_pink_horitzontal.png)
 
 [![IMPaCT](https://img.shields.io/badge/Web%20-IMPaCT-blue)](https://impact.isciii.es/)
 [![IMPaCT-isciii](https://img.shields.io/badge/Web%20-IMPaCT--isciii-red)](https://www.isciii.es/QueHacemos/Financiacion/IMPaCT/Paginas/default.aspx)
