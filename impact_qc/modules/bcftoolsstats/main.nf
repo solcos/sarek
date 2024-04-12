@@ -41,8 +41,14 @@ process BCFTOOLSSTATS {
     # Calculate het/hom ratio
     het_hom_ratio=\$(awk "BEGIN {printf \\"%.4f\\", \$het_snp_sites / \$non_ref_hom_snp_sites}")
 
+    # Echo multiqc config in report
+    echo "# id: 'bcftools_stats'" > tmp.tsv
+    echo "# section_name: 'Custom bcftools stats'" >> tmp.tsv
+    echo "# description: 'Metrics from bcftools stats'" >> tmp.tsv 
+    echo "# plot_type: 'generalstats'" >> tmp.tsv
+
     # Echo the names to a file
-    echo -e "Sample\\tRATIO_HET-HOM\\tN_MULTIALLELIC_VARIANTS\\tN_MULTIALLELIC_SNP_VARIANTS" > tmp.tsv
+    echo -e "Sample\\tRATIO_HET-HOM\\tN_MULTIALLELIC_VARIANTS\\tN_MULTIALLELIC_SNP_VARIANTS" >> tmp.tsv
     
     # Echo stats
     awk -v var0="\$id" -v var1="\$het_hom_ratio" -v var2="\$multiallelic_sites" -v var3="\$multiallelic_snp_sites" 'BEGIN{OFS="\\t"} {print} END{print var0,var1,var2,var3}' tmp.tsv > ${prefix}.bcftools_stats_mqc.tsv 

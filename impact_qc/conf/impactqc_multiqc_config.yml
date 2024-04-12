@@ -17,6 +17,7 @@ run_modules:
   - snpeff
   - vep
 
+# Module order (change group names)
 module_order:
   - fastqc:
       name: "FastQC (raw)"
@@ -48,6 +49,7 @@ module_order:
   - vep:
       name: "VEP"
 
+# Mosdepth show which coverage thresholds
 mosdepth_config:
   general_stats_coverage:
     - 1 
@@ -56,51 +58,53 @@ mosdepth_config:
     - 30
     - 100
 
+# Fastq screen
 fastqscreen_simpleplot: true
 
-custom_data:
-  fastp_stats:
-    id: "fastp_stats"
-    section_name: "Fastp stats"
-    plot_type: "table"
-    pconfig:
-      id: "fastp_stats"
-      namespace: "Fastp stats"
-    headers:
-      N_SEQ_BASES_BEFORE:
-        description: "Number of sequenced bases before filtering"
-      N_SEQ_BASES_AFTER:
-        description: "Number of sequenced bases after filtering"
-      N_SEQ_BASES_Q30_BEFORE:
-        description: "Number of sequenced bases qith Q>30 before filtering"
-      N_SEQ_BASES_Q30_AFTER:
-        description: "Number of sequenced bases qith Q>30 after filtering"
-      N_READS_BEFORE:
-        description: "Number of reads before filtering"
-      N_READS_AFTER:
-        description: "Number of reads after filtering"
-      PCT_PASSED_READS:
-        description: "Percentage of reads that passed the filtering"
-      PCT_FAILED_READS: 
-        description: "Percentage of reads that failed the filtering"
-  bcftools_stats:
-    id: "bcftools_stats"
-    section_name: "Bcftools stats"
-    plot_type: "generalstats"
-    pconfig:
-      id: "bcftools_stats"
-      namespace: "Bcftools stats"
-    headers:
-     RATIO_HET-HOM: "Ratio of heterzygous/homozygous variants"
-     N_MULTIALLELIC_VARIANTS: "Number of multiallelic variants"
-     N_MULTIALLELIC_SNP_VARIANTS: "Number of multialleic SNP variants"
- 
-
-sp:
-  fastp_stats:
-    fn: "*.fastp_stats_mqc.tsv"
-  bcftools_stats:
-    fn: "*.bcftools_stats_mqc.tsv"
+# Test custom data
+#custom_data:
+#  fastp_stats:
+#    id: "fastp_stats"
+#    section_name: "Fastp stats"
+#    plot_type: "table"
+#    pconfig:
+#      id: "fastp_stats"
+#      namespace: "Fastp stats"
+#    headers:
+#      N_SEQ_BASES_BEFORE:
+#        description: "Number of sequenced bases before filtering"
+#      N_SEQ_BASES_AFTER:
+#        description: "Number of sequenced bases after filtering"
+#      N_SEQ_BASES_Q30_BEFORE:
+#        description: "Number of sequenced bases qith Q>30 before filtering"
+#      N_SEQ_BASES_Q30_AFTER:
+#        description: "Number of sequenced bases qith Q>30 after filtering"
+#      N_READS_BEFORE:
+#        description: "Number of reads before filtering"
+#      N_READS_AFTER:
+#        description: "Number of reads after filtering"
+#      PCT_PASSED_READS:
+#        description: "Percentage of reads that passed the filtering"
+#      PCT_FAILED_READS: 
+#        description: "Percentage of reads that failed the filtering"
+#  bcftools_stats:
+#    id: "bcftools_stats"
+#    section_name: "Bcftools stats"
+#    plot_type: "generalstats"
+#    pconfig:
+#      id: "bcftools_stats"
+#      namespace: "Bcftools stats"
+#    headers:
+#     RATIO_HET-HOM: "Ratio of heterzygous/homozygous variants"
+#     N_MULTIALLELIC_VARIANTS: "Number of multiallelic variants"
+#     N_MULTIALLELIC_SNP_VARIANTS: "Number of multialleic SNP variants"
+# 
+#
+#sp:
+#  fastp_stats:
+#    fn: "*fastp_stats_mqc.tsv"
+#  bcftools_stats:
+#    fn: "*bcftools_stats_mqc.tsv"
 
 ### TEST
 #custom_data:
@@ -119,6 +123,7 @@ sp:
     #fn: "*_stats_mqc.tsv"
     #fn: "*_mqc.tsv"
 
+# General statistics table visible columns
 table_columns_visible:
   FastQC (raw):
     percent_duplicates: True
@@ -134,18 +139,7 @@ table_columns_visible:
     after_filtering_gc_content: True
     filtering_result_passed_filter_reads: False
     pct_surviving: False
-      #GATK-PICARD tools/HsMetrics:
-      #FOLD_ENRICHMENT: True
-      #MEDIAN_TARGET_COVERAGE: False
-      #PCT_TARGET_BASES_30X: False
-      #GATK-PICARD tools/InsertSizeMetrics:
-      #summed_median: True
-      #summed_mean: True
-      #GATK-PICARD tools/Mark Duplicates:
-      #PERCENT_DUPLICATION: True
-      #GATK-PICARD tools/TargetedPcrMetrics:
-      #PCT_AMPLIFIED_BASES: True
-  samtools/stats:
+  Samtools Flagstat:
     error_rate: True
     non-primary_alignments: False
     reads_mapped: True
@@ -153,7 +147,6 @@ table_columns_visible:
     reads_properly_paired_percent: True
     reads_MQ0_percent: False
     raw_total_sequences: False
-  samtools/flagstat:
     flagstat_total: True
     mapped_passed: False
     mapped_passed_pct: False
@@ -179,6 +172,7 @@ table_columns_visible:
     variations_hom: True
     variations_het: True
 
+# General statistics table picard columns conf
 picard_config:
   HsMetrics_genstats_table_cols:
     - FOLD_ENRICHMENT
@@ -193,6 +187,7 @@ picard_config:
   pcrmetrics_genstats_table_cols:
     - PCT_AMPLIFIED_BASES
 
+# General statistics table placement
 table_columns_placement:
   FastQC (raw):
     percent_duplicates: 990
@@ -208,18 +203,7 @@ table_columns_placement:
     filtering_result_passed_filter_reads: 1000
     pct_surviving: 1000
     after_filtering_gc_content: 1000
-  #GATK-PICARD tools/HsMetrics:
-  #  FOLD_ENRICHMENT: 1020
-  #  MEDIAN_TARGET_COVERAGE: 1020
-  #  PCT_TARGET_BASES_30X: 1020
-  #GATK-PICARD tools/InsertSizeMetrics:
-  #  summed_median: 1016
-  #  summed_mean: 1016
-  #GATK-PICARD tools/Mark Duplicates:
-  #  PERCENT_DUPLICATION: 1021
-  #GATK-PICARD tools/TargetedPcrMetrics:
-  #  PCT_AMPLIFIED_BASES: 1021
-  samtools/stats:
+  Samtools Flagstat:
     error_rate: 1017
     non-primary_alignments: 1017
     reads_mapped: 1017
@@ -227,7 +211,6 @@ table_columns_placement:
     reads_properly_paired_percent: 1017
     reads_MQ0_percent: 1017
     raw_total_sequences: 1017
-  samtoolsflagstat:
     flagstat_total: 1017
     mapped_passed: 1017
     mapped_passed_pct: 1017
@@ -252,13 +235,34 @@ table_columns_placement:
     number_of_MNPs: 1060
     variations_hom: 1045
     variations_het: 1045
-  bcftools_stats:
-     RATIO_HET-HOM: 1064
-     N_MULTIALLELIC_VARIANTS: 1065
-     N_MULTIALLELIC_SNP_VARIANTS: 1066
-  fastp_stats:
+  Custom content:
+    #bcftools_stats:
+    RATIO_HET-HOM: 1080
+    N_MULTIALLELIC_VARIANTS: 1081
+    N_MULTIALLELIC_SNP_VARIANTS: 1082
+       #fastp_stats:
     N_SEQ_BASES_BEFORE: 1001
     N_SEQ_BASES_AFTER: 1002
     N_SEQ_BASES_Q30_BEFORE: 1003
+    N_SEQ_BASES_Q30_AFTER: 1004
     N_READS_BEFORE: 1005
-    PCT_FAILED_READS: 1008    
+    N_READS_AFTER: 1006
+    PCT_PASSED_READS: 1007
+    PCT_FAILED_READS: 1008
+
+
+#RATIO_HET-HOM
+#N_MULTIALLELIC_VARIANTS
+#N_MULTIALLELIC_SNP_VARIANTS
+#N_SEQ_BASES_BEFORE_multiplier: 0.000001
+#N_SEQ_BASES_BEFORE_prefix: "M"
+#N_SEQ_BASES_BEFORE_desc: "millions"
+#N_SEQ_BASES_AFTER_multiplier: 0.000001
+#N_SEQ_BASES_AFTER_prefix: "M"
+#N_SEQ_BASES_AFTER_desc: "millions"
+#N_SEQ_BASES_Q30_BEFORE: 1003
+#N_SEQ_BASES_Q30_AFTER: 1004
+#N_READS_BEFORE: 1005
+#N_READS_AFTER: 1006
+#PCT_PASSED_READS: 1007
+#PCT_FAILED_READS:
