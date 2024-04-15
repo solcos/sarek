@@ -43,11 +43,36 @@ process FASTPSTATS {
     percentage_failed=\$(echo \$percentage_passed | awk '{ print 100 - \$1}')
 
     # Echo multiqc config in report
-    echo "# id: 'fastp_stats'" > tmp.tsv
-    echo "# section_name: 'Custom fastp stats'" >> tmp.tsv
-    echo "# description: 'Metrics from fastp stats'" >> tmp.tsv
-    echo "# plot_type: 'generalstats'" >> tmp.tsv
-
+    echo "# id: 'fastp_stats'
+     # section_name: 'Custom fastp stats' 
+     # description: 'Metrics from fastp stats' 
+     # plot_type: 'generalstats'
+     # pconfig:
+     #     - N_SEQ_BASES_BEFORE: 
+     #         description: 'Number of sequenced bases before filtering' 
+     #         format: '{:,.0f}'
+     #     - N_SEQ_BASES_AFTER: 
+     #         description: 'Number of sequenced bases after filtering' 
+     #         format: '{:,.0f}'
+     #     - N_SEQ_BASES_Q30_BEFORE: 
+     #         description: 'Number of sequenced bases with Q30 or more before filtering'
+     #         format: '{:,.0f}'
+     #     - N_SEQ_BASES_Q30_AFTER: 
+     #         description: 'Number of sequenced bases with Q30 or more after filtering'
+     #         format: '{:,.0f}'
+     #     - N_READS_BEFORE:
+     #         description: 'Number of reads before filtering'
+     #         format: '{:,.0f}'
+     #     - N_READS_AFTER:
+     #         description: 'Number of reads after filtering'
+     #         format: '{:,.0f}'
+     #     - PCT_PASSED_READS:
+     #         description: 'Percentage of reads that passed the filtering'
+     #         format: '{:,.2f}'
+     #     - PCT_FAILED_READS:
+     #         description: 'Percentage of reads that failed the filtering'
+     #         format: '{:,.2f}'" > tmp.tsv
+ 
     # Echo names to a file
     echo -e "Sample\\tN_SEQ_BASES_BEFORE\\tN_SEQ_BASES_AFTER\\tN_SEQ_BASES_Q30_BEFORE\\tN_SEQ_BASES_Q30_AFTER\\tN_READS_BEFORE\\tN_READS_AFTER\\tPCT_PASSED_READS\\tPCT_FAILED_READS" >> tmp.tsv
     
