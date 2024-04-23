@@ -15,10 +15,9 @@ process VCFTOOLSCUSTOM {
    
     output:
     tuple val(meta), path("*.{FORMAT,INFO}")            , emit: distribution
-    tuple val(meta), path("*.FORMAT")                   , emit: format
-    //tuple val(meta), path("*.INFO")                   , emit: info
+    tuple val(meta), path("*_mqc.txt")                  , emit: mqc_gq_distribution
     
-    path "versions.yml"                               , emit: versions
+    path "versions.yml"                                 , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -47,20 +46,14 @@ process VCFTOOLSCUSTOM {
         ("$variant_file".endsWith(".bcf")) ? "--bcf ${variant_file}" : ''
 
     """
-
+    id="${prefix}"
+    
     # GQ distribution
     vcftools \\
             $input_file \\
             --out $prefix \\
             --extract-FORMAT-info GQ \\
             $args
-
-    # VCF strand bias
-    #vcftools \\
-    #        $input_file \\
-    #        --out $prefix \\
-    #        --extract-FORMAT-info SB \\
-    #        $args
 
     # Bcftools mpileup
     if [[ $variant_file == *"bcftools"* ]]; then
@@ -70,6 +63,9 @@ process VCFTOOLSCUSTOM {
             --out $prefix \\
             --extract-FORMAT-info SP \\
             $args
+
+        # Remove variant caller for the sample name id
+        sample="\${id%.bcftools}"
     
     # Freebayes
     elif [[ $variant_file == *"freebayes"* ]]; then
@@ -80,6 +76,9 @@ process VCFTOOLSCUSTOM {
             --get-INFO SRP --get-INFO SAP --get-INFO EPP \\
             $args
 
+        # Remove variant caller for the sample name id
+        sample="\${id%.freebayes}"
+
     # Haplotypecaller
     elif [[ $variant_file == *"haplotypecaller"* ]]; then
 
@@ -89,6 +88,9 @@ process VCFTOOLSCUSTOM {
             --get-INFO FS \\
             $args
     
+        # Remove variant caller for the sample name id
+        sample="\${id%.haplotypecaller}"
+
     # Strelka
     elif [[ $variant_file == *"strelka"* ]]; then
 
@@ -97,11 +99,39 @@ process VCFTOOLSCUSTOM {
             --out $prefix \\
             --extract-FORMAT-info SB \\
             $args
+    
+        # Remove variant caller for the sample name id
+        sample="\${id%.strelka}"
 
     else
         touch test.FORMAT test.INFO
+        rm test.FORMAT test.INFO
+        echo "WARNING \${id}: There is no 'strand bias' distribution for the variant caller selected"
     fi
+
+    # Prepare files for MultiQC
+    # GQ distribution
+    cut -f3 *GQ.FORMAT > tmp.txt
+    sed -i "1s/^/Sample\\n/" tmp.txt
+    sed -i 's/\$/,/g' tmp.txt
+
+    # Transpose the table to match the MultiQC configuration
+    n_cols=\$(head -1 tmp.txt | wc -w)
+    for i in \$(seq 1 "\$n_cols"); do
+        echo \$(cut -d ' ' -f "\$i" tmp.txt)
+    done > \${sample}_GQ.FORMAT_mqc.txt
+
+    # Edit file to achive the desired configuration for MultiQC
+    sed -i 's/, /,/g' \${sample}_GQ.FORMAT_mqc.txt
+    sed -i 's/,\$//g' \${sample}_GQ.FORMAT_mqc.txt
+    sed -i 's/Sample,/Sample /g' \${sample}_GQ.FORMAT_mqc.txt
  
+    # MultiQC plot type
+    sed -i "1s/^/# plot_type: 'linegraph'\\n/" \${sample}_GQ.FORMAT_mqc.txt
+
+    # Remove temporary file
+    rm tmp.txt
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         vcftools: \$(echo \$(vcftools --version 2>&1) | sed 's/^.*VCFtools (//;s/).*//')

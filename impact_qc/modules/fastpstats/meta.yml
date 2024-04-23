@@ -1,0 +1,43 @@
+name: fastpstats
+description: Extracts different metrics from the fastp output
+keywords:
+  - bases
+  - reads
+  - quality
+  - before
+  - after
+  - preprocessing
+  - fastq
+tools:
+  - custom:
+      description: |
+        Parses the fastp output and produces a file with the values of total bases (also with Q>30) before and after filtering, total reads before and after filtering and percentage of reads that failed and passed the filtering.
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - json:
+      type: file
+      description: fastp output file
+      pattern: "*.{json}"
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - fastpstats:
+      type: file
+      description: Text output file containing the counts of bases, reads before and after filtering.
+      pattern: "*fastp_stats_mqc.tsv"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@solcos"
+maintainers:
+  - "@solcos"

@@ -1,0 +1,42 @@
+name: bcftoolsstats
+description: Calculate the het/hom ratio from the bcftools output
+keywords:
+  - variant calling
+  - heterozygous
+  - homozygous
+  - ratio
+  - counts
+  - VCF
+tools:
+  - custom:
+      description: |
+        Parses bcftools output and produces a file with the values of het/hom ratio + the counts.
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - stats:
+      type: file
+      description: Bcftools output input file
+      pattern: "*.{txt}"
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - stats:
+      type: file
+      description: Text output file containing het/hom ratio + counts
+      pattern: "*_{bcftools_stats_mqc.tsv}"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@solcos"
+maintainers:
+  - "@solcos"

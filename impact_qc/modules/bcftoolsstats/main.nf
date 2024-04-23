@@ -4,12 +4,11 @@ process BCFTOOLSSTATS {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bcftools:1.17--haef29d1_0' :
-        'biocontainers/bcftools:1.17--haef29d1_0' }"
+        'https://depot.galaxyproject.org/singularity/bcftools:1.19--h8b25389_1' :
+        'biocontainers/bcftools:1.19--h8b25389_1' }"
  
     input:
     tuple val(meta), path(stats)
-    //path stats
 
     output: 
     tuple val(meta), path("*bcftools_stats_mqc.tsv"), emit: stats 
@@ -43,7 +42,8 @@ process BCFTOOLSSTATS {
 
     # Echo multiqc config in report
     echo "# id: 'bcftools_stats'
-    # section_name: 'Custom bcftools stats' 
+    # section_name: 'Custom bcftools stats'
+    # namespace: 'bcftools_stats'  
     # description: 'Metrics from bcftools stats' 
     # plot_type: 'generalstats'
     # pconfig:
@@ -64,7 +64,6 @@ process BCFTOOLSSTATS {
     awk -v var0="\$id" -v var1="\$het_hom_ratio" -v var2="\$multiallelic_sites" -v var3="\$multiallelic_snp_sites" 'BEGIN{OFS="\\t"} {print} END{print var0,var1,var2,var3}' tmp.tsv > ${prefix}.bcftools_stats_mqc.tsv 
     
     # Remove temporary file
-    rm tmp.tsv
-      
+    rm tmp.tsv 
     """
 }

@@ -1087,42 +1087,20 @@ workflow SAREK {
 
 
 
-
         
     // IMPACT QC
     if (!(params.skip_tools && params.skip_tools.split(',').contains('impactqc'))) {
 
-        /* 
-        // If the pipeline starts from BAM file
-        if (!(params.step in ['markduplicates', 'prepare_recalibration', 'recalibrate'])) {
-            // Channel with the results of fastp (meta + json)
-            fastp_results = Channel.empty()
-            fastp_results = FASTP.out.json.map{ meta, json -> [ meta, json ] }
-        } else {
-            // Empty channels for subtituing the ones from fastq steps
-            fastp_results = Channel.empty()
-            reads_for_alignment = Channel.empty()
-        }
-
-        // If the pipeline does run variant calling
-        if (!(params.tools)) {
-            // Empty channel to replace vcf file 
-            vcf_to_annotate = Channel.empty()            
-        }
-        */
-
-        // Pipeline does not start from fastq
+        // If pipeline does not start from fastq
         fastp_results   =  FASTP.out.json 
             ? FASTP.out.json.map{ meta, json -> [ meta, json ] } 
             : Channel.empty()
-        
         
         // Multiallelic variants counts metric to MultiQC report
         bcftools_stats_results   =  VCF_QC_BCFTOOLS_VCFTOOLS.out.bcftools_stats 
             ? VCF_QC_BCFTOOLS_VCFTOOLS.out.bcftools_stats
             : Channel.empty()
         
-
         // If the pipeline does run variant calling
         final_vcf   =  vcf_to_annotate
             ? vcf_to_annotate
@@ -1141,8 +1119,8 @@ workflow SAREK {
                   bcftools_stats_results)
         
         // Gather QC reports
-        reports = reports.mix(IMPACT_QC.out.reports.collect{ meta, report -> report })
-    
+        reports = reports.mix(IMPACT_QC.out.impact_qc_reports.collect{ meta, report -> report })
+
         // Gather used softwares versions
         versions = versions.mix(IMPACT_QC.out.versions)
     }
