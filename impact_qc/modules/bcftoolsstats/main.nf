@@ -38,7 +38,7 @@ process BCFTOOLSSTATS {
     het_snp_sites=\$(cat $stats | grep "^PSC" | cut -f6)
 
     # Calculate het/hom ratio
-    het_hom_ratio=\$(awk "BEGIN {printf \\"%.4f\\", \$het_snp_sites / \$non_ref_hom_snp_sites}")
+    het_hom_ratio=\$(awk "BEGIN {if (hom != 0) printf \\"%.4f\\", \$het_snp_sites / \$non_ref_hom_snp_sites; else printf \\"%.4f\\", 0}")
 
     # Echo multiqc config in report
     echo "# id: 'bcftools_stats'
@@ -62,7 +62,7 @@ process BCFTOOLSSTATS {
     
     # Echo stats
     awk -v var0="\$id" -v var1="\$het_hom_ratio" -v var2="\$multiallelic_sites" -v var3="\$multiallelic_snp_sites" 'BEGIN{OFS="\\t"} {print} END{print var0,var1,var2,var3}' tmp.tsv > ${prefix}.bcftools_stats_mqc.tsv 
-    
+                                                            
     # Remove temporary file
     rm tmp.tsv 
     """

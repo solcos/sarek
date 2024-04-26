@@ -16,7 +16,16 @@
 // For all modules here:
 // A when clause condition is defined in the 'impact_qc/impact_qc.config' to determine if the module should be run
 
-// Add to nextflow_schema.json skip tools pattern: "bcftoolscustom|bcftoolsstats|collectinsertsizemetrics|collecthsmetrics|collecttargetedpcrmetrics|fastqscreen|fastpstats|flagstat|impactqc|sexdeterrmine|somalier|vcftoolscustom"
+// Information for the configuration of Sarek
+// Add to 'nextflow_schema.json' tools pattern: "plotallelicreadpct|plotgq|plotsb"
+// Add to 'nextflow_schema.json' skip tools pattern: "bcftoolscustom|bcftoolsstats|collectinsertsizemetrics|collecthsmetrics|collecttargetedpcrmetrics|fastqscreen|fastpstats|flagstat|impactqc|sexdeterrmine|somalier|vcftoolscustom"
+
+// Add to FastQC module 'main.nf' before 'fastqc' command:
+//# Activate kmer module
+//sed -i "5s:1:0:g" /usr/local/opt/fastqc-0.12.1/Configuration/limits.txt
+
+// Add sites path to 'igenomes.config' in the differents reference genomes (specify the version)
+// somalier_sites = "${projectDir}/impact_qc/assets/sites/sites.{version}.vcf.gz"
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -91,7 +100,7 @@ include { VCFTOOLSCUSTOM                            } from './modules/vcftoolscu
 
 workflow IMPACT_QC {
 
-    take: 
+    take:
     fa
     fai
     dic
@@ -304,9 +313,14 @@ workflow IMPACT_QC {
             // Gather all reports generated
             impact_qc_reports = impact_qc_reports.mix(VCFTOOLSCUSTOM.out.distribution)
 
-            // Not plot distribution in MultiQC if 'plotgq' is in tools
+            // Not plot GQ distribution in MultiQC if 'plotgq' is in tools
             if (params.tools && params.tools.split(',').contains('plotgq')) {
                 impact_qc_reports = impact_qc_reports.mix(VCFTOOLSCUSTOM.out.mqc_gq_distribution)
+            }
+
+            // Not plot SB distribution in MultiQC if 'plotsb' is in tools (different types of SB for the different variant callers)
+            if (params.tools && params.tools.split(',').contains('plotsb')) {
+                impact_qc_reports = impact_qc_reports.mix(VCFTOOLSCUSTOM.out.mqc_sb_distribution)
             }
 
             // Gather versions of all tools used 

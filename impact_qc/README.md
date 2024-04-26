@@ -59,9 +59,11 @@ For `CollectHsMetrics` and `CollectTargetedPcrMetrics` you need to provide the n
 
 ### MultiQC
 
-Different metrics in the IMPaCT QC final MultiQC report are reported using a custom content configuration. For the the metrics 'Allelic read percentages' (the distribution of the Alternate allele percetages) and 'GQ distribution' (the distribution of the GQ) are both configured to not be reported in the final report since the only way to do it was to plot with one plot per sample. You can activate the plotting in the final report adding `plotallelicreadpct` and `plotgq`, respectively, in the `tools` parameter. These will create a plot per sample per metric in the final report. We recomend setting this when you have a limited number of samples, for visualizing issues.
+Different metrics in the IMPaCT QC final MultiQC report are reported using a custom content configuration. For the the metrics 'Allelic read percentages' (the distribution of the Alternate allele percetages), 'GQ distribution' (the distribution of the GQ) and 'strand bias (SB) distribution are all configured to not be reported in the final report since the only way to do it is having one plot per sample and per variant caller executed. You can activate the plotting in the final report adding `plotallelicreadpct`, `plotgq` and `plotsb`, respectively, in the `tools` parameter. These will create a plot per sample per metric per variant caller executed in the final report. We recomend setting this when you have a limited number of samples, for visualizing issues.
 
-Note: This is because each sample would have a different number of variants and plotting different samples in the same plot with different number of axis values, is not posible.
+*Note: This is because each sample would have a different number of variants and plotting different samples in the same plot with different number of axis values, hence this is not posible.*
+
+Bear in mind that each variant caller has a different type of strand bias format: `bcftools mpileup` outputs `SP`, `freebayes` outputs `SAP`, `SRP` and `EPP`, `haplotypecaller` outputs `FS` and `strelka2` outputs `SB`. `DeepVariant` does not output the strand bias information. Take a look at the different tools documentation to know more about it.
 
 ## Usage
 

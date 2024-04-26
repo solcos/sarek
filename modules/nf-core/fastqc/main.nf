@@ -30,7 +30,7 @@ process FASTQC {
         [ -f "\${new_name}" ] || ln -s \$old_name \$new_name
     done
 
-    # Activate kmer module
+    # Activate kmer module (IMPaCT QC)
     sed -i "5s:1:0:g" /usr/local/opt/fastqc-0.12.1/Configuration/limits.txt
 
     fastqc \\

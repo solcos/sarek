@@ -2,7 +2,7 @@
 
 # Run only these modules
 run_modules:
-  - custom_content 
+  #- custom_content 
   - fastqc
   - fastp
   - picard
@@ -14,6 +14,7 @@ run_modules:
   - fastq_screen
   - bcftools
   - vcftools
+  - custom_content 
   - snpeff
   - vep
 
