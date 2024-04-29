@@ -18,7 +18,7 @@
 
 // Information for the configuration of Sarek
 // Add to 'nextflow_schema.json' tools pattern: "plotallelicreadpct|plotgq|plotsb"
-// Add to 'nextflow_schema.json' skip tools pattern: "bcftoolscustom|bcftoolsstats|collectinsertsizemetrics|collecthsmetrics|collecttargetedpcrmetrics|fastqscreen|fastpstats|flagstat|impactqc|sexdeterrmine|somalier|vcftoolscustom"
+// Add to 'nextflow_schema.json' skip tools pattern: "bcftoolscustom|bcftoolsstats|collectinsertsizemetrics|collecthsmetrics|fastqscreen|fastpstats|flagstat|impactqc|sexdeterrmine|somalier|vcftoolscustom"
 
 // Add to FastQC module 'main.nf' before 'fastqc' command:
 //# Activate kmer module
@@ -63,9 +63,6 @@ include { COLLECTINSERTSIZEMETRICS                  } from './modules/gatk4/coll
 
 // Collect Hs Metrics
 include { COLLECTHSMETRICS                          } from './modules/gatk4/collecthsmetrics/main'
-
-// Collect Targeted Pcr Metrics
-include { COLLECTTARGETEDPCRMETRICS                 } from './modules/gatk4/collecttargetedpcrmetrics/main'
 
 // Samtools flagstat
 include { SAMTOOLS_FLAGSTAT                         } from './modules/samtools/flagstat/main'
@@ -201,25 +198,6 @@ workflow IMPACT_QC {
         // Gather versions of all tools used 
         versions = versions.mix(COLLECTHSMETRICS.out.versions)
             
-    }
-
-    // CollectTargetedPcrMetrics
-    if (!(params.skip_tools && params.skip_tools.split(',').contains('collecttargetedpcrmetrics'))) {
-             
-        // Amplicon or target intervals do not exist
-        amplicon_intervals.ifEmpty{ println("ERROR: Amplicon intervals is empty or is not found. Put the path to the correct amplicon intervals in 'amplicon_intervals' or add 'collecttargetedpcrmetrics' to the 'skip_tools'.") }
-        target_intervals.ifEmpty{ println("ERROR: Target intervals is empty or is not found. Put the path to the correct target intervals in 'target_intervals' or add 'collecttargetedpcrmetrics' to the 'skip_tools'.") }
-
-        if ( true ) { println "[GATK CollectTargetedPcrMetrics] WARNING: PICARD CollectTargetedPcrMetrics needs the intervals files for --amplicon_intervals and --target_intervals, (One or more genomic intervals over which to operate). Also, this tool will not be processed by MultiQC." }
-
-        // RUN COLLECT TARGETED PCR METRICS
-        COLLECTTARGETEDPCRMETRICS(input, amplicon_intervals, target_intervals, fa, fai, dic)
-
-        // Gather all reports generated
-        impact_qc_reports = impact_qc_reports.mix(COLLECTTARGETEDPCRMETRICS.out.metrics)
-    
-        // Gather versions of all tools used 
-        versions = versions.mix(COLLECTTARGETEDPCRMETRICS.out.versions)
     }
         
     // Samtools flagstat

@@ -81,7 +81,6 @@ Take into account that all the modules in the IMPaCT QC workflow can be disabled
 
 - collectinsertsizemetrics
 - collecthsmetrics
-- collecttargetedpcrmetrics
 - fastqscreen
 - flagstat
 - imapctqc

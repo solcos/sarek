@@ -30,7 +30,7 @@ module_order:
       name: "FastQ Screen"
   - picard:
       name: "GATK-PICARD tools"
-      info: "Metrics generated either by GATK4 MarkDuplicates or EstimateLibraryComplexity (with --use_gatk_spark), GATK4 CollectInsertSizeMetrics, CollectHsMetrics and CollectTargetedPcrMetrics"
+      info: "Metrics generated either by GATK4 MarkDuplicates or EstimateLibraryComplexity (with --use_gatk_spark), GATK4 CollectInsertSizeMetrics and CollectHsMetrics."
   - samtools:
       name: "Samtools Flagstat"
   - mosdepth:
@@ -123,8 +123,6 @@ picard_config:
     - summed_mean
   markdups_genstats_table_cols:
     - PERCENT_DUPLICATION
-  pcrmetrics_genstats_table_cols:
-    - PCT_AMPLIFIED_BASES
 
 # General statistics table placement
 table_columns_placement:
