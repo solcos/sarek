@@ -1,0 +1,39 @@
+name: madinsertsizecustom
+description: Computes the MAD insert size from the CollectInsertSizeMetrics.
+keywords:
+  - Insert size
+  - MAD
+tools:
+  - gatk4:
+      description: |
+        Developed in the Data Sciences Platform at the Broad Institute, the toolkit offers a wide variety of tools
+        with a primary focus on variant discovery and genotyping. Its powerful processing engine
+        and high-performance computing features make it capable of taking on projects of any size.
+      homepage: https://gatk.broadinstitute.org/hc/en-us
+      documentation: https://gatk.broadinstitute.org/hc/en-us/articles/13832774634139-DepthOfCoverage-BETA-
+      doi: 10.1158/1538-7445.AM2017-3590
+      licence: ["Apache-2.0"]
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - insertsizemetrics:
+      type: file
+      description: CollectInsertSizeMetrics results file
+      pattern: "*.{txt}"
+  
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - mqc_madinsertsize:
+      type: file
+      description: The output of madinsertsizecustom for the MultiQC report.
+      pattern: "*.{tsv}"
+
+authors:
+  - "@solcos"

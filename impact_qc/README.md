@@ -55,11 +55,11 @@ To use the indexes in the IMPaCT-QC workflow you need to put the indexes in a fo
 
 ### Picard
 
-For `CollectHsMetrics` and `CollectTargetedPcrMetrics` you need to provide the necessary intervals files for each tool in the respective parameters; target intervals file (`--target-intervals`), bait intervals file (`--bait-intervals`) and amplicon intervals file (`--amplicon-intervals`).
+For `CollectHsMetrics` you need to provide the necessary intervals files for the tool in the respective parameters; target intervals file (`--target-intervals`) and bait intervals file (`--bait-intervals`).
 
 ### MultiQC
 
-Different metrics in the IMPaCT QC final MultiQC report are reported using a custom content configuration. For the the metrics 'Allelic read percentages' (the distribution of the Alternate allele percetages), 'GQ distribution' (the distribution of the GQ) and 'strand bias (SB) distribution are all configured to not be reported in the final report since the only way to do it is having one plot per sample and per variant caller executed. You can activate the plotting in the final report adding `plotallelicreadpct`, `plotgq` and `plotsb`, respectively, in the `tools` parameter. These will create a plot per sample per metric per variant caller executed in the final report. We recomend setting this when you have a limited number of samples, for visualizing issues.
+Different metrics in the IMPaCT QC final MultiQC report are reported using a custom content configuration. For the the metrics 'Allelic read percentages' (the distribution of the Alternate allele percetages), 'DP distribution', 'GQ distribution' (the distribution of the GQ) and 'strand bias (SB) distribution are all configured to not be reported in the final report since the only way to do it is having one plot per sample and per variant caller executed. You can activate the plotting in the final report adding `plotallelicreadpct`, `plotdp`, `plotgq` and `plotsb`, respectively, in the `tools` parameter. These will create a plot per sample per metric per variant caller executed in the final report. We recomend setting this when you have a limited number of samples, for visualizing issues.
 
 *Note: This is because each sample would have a different number of variants and plotting different samples in the same plot with different number of axis values, hence this is not posible.*
 

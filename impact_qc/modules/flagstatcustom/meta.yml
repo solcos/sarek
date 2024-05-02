@@ -1,0 +1,39 @@
+name: flagstatcustom
+description: Computes the percent of paired reads mapping to different chromosomes, with MAPQ>=5.
+keywords:
+  - samtools
+  - flagstat
+  - paired reads
+tools:
+  - samtools:
+      description: Tools for dealing with SAM, BAM and CRAM files; samtools depth – computes the read depth at each position or region
+      homepage: http://www.htslib.org
+      documentation: http://www.htslib.org/doc/samtools-depth.html
+      tool_dev_url: https://github.com/samtools/samtools
+      doi: "10.1093/bioinformatics/btp352"
+      licence: ["MIT"]
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - flagstat:
+      type: file
+      description: Flafstat results file
+      pattern: "*{results}"
+  
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - mqc_paired_reads_diff_chr_mapq5_pct:
+      type: file
+      description: The output of samtoolscustom for the MultiQC report.
+      pattern: "*.{tsv}"
+
+authors:
+  - "@solcos"

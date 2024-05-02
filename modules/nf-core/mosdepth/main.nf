@@ -48,8 +48,7 @@ process MOSDEPTH {
         $reference \\
         $args \\
         $prefix \\
-        $bam \\
-        --thresholds 1,8,10,20,30,100
+        $bam        
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

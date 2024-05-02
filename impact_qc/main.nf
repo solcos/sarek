@@ -17,7 +17,7 @@
 // A when clause condition is defined in the 'impact_qc/impact_qc.config' to determine if the module should be run
 
 // Information for the configuration of Sarek
-// Add to 'nextflow_schema.json' tools pattern: "plotallelicreadpct|plotgq|plotsb"
+// Add to 'nextflow_schema.json' tools pattern: "plotallelicreadpct|plotdp|plotgq|plotsb"
 // Add to 'nextflow_schema.json' skip tools pattern: "bcftoolscustom|bcftoolsstats|collectinsertsizemetrics|collecthsmetrics|fastqscreen|fastpstats|flagstat|impactqc|sexdeterrmine|somalier|vcftoolscustom"
 
 // Add to FastQC module 'main.nf' before 'fastqc' command:
@@ -61,11 +61,15 @@ include { SAMTOOLS_CONVERT as CRAM_TO_BAM_IMPACT_QC } from '../modules/nf-core/s
 // Collect Insert Size Metrics
 include { COLLECTINSERTSIZEMETRICS                  } from './modules/gatk4/collectinsertsizemetrics/main'
 
+// Mad Insert Size Custom
+include { MADINSERTSIZECUSTOM                       } from './modules/madinsertsizecustom/main'
+
 // Collect Hs Metrics
 include { COLLECTHSMETRICS                          } from './modules/gatk4/collecthsmetrics/main'
 
 // Samtools flagstat
 include { SAMTOOLS_FLAGSTAT                         } from './modules/samtools/flagstat/main'
+include { FLAGSTATCUSTOM                            } from './modules/flagstatcustom/main'
 
 // Sex determine
 include { SAMTOOLS_DEPTH                            } from './modules/samtools/depth/main'
@@ -174,10 +178,18 @@ workflow IMPACT_QC {
         // Gather all reports generated
         impact_qc_reports = impact_qc_reports.mix(COLLECTINSERTSIZEMETRICS.out.metrics)
         impact_qc_reports = impact_qc_reports.mix(COLLECTINSERTSIZEMETRICS.out.histogram)
+        
+        // Metrics for MultiQC
+        mad_insert_size_ch = COLLECTINSERTSIZEMETRICS.out.metrics
 
         // Gather versions of all tools used 
         versions = versions.mix(COLLECTINSERTSIZEMETRICS.out.versions)
  
+        // RUN MAD INSERT SIZE CUSTOM
+        MADINSERTSIZECUSTOM(mad_insert_size_ch)
+
+        // Gather all reports generated
+        impact_qc_reports = impact_qc_reports.mix(MADINSERTSIZECUSTOM.out.mqc_madinsertsize)
     }
       
     // CollectHsMetrics
@@ -203,14 +215,24 @@ workflow IMPACT_QC {
     // Samtools flagstat
     if (!(params.skip_tools && params.skip_tools.split(',').contains('flagstat'))) {
 
-       // RUN SAMTOOLS FLAGSTAT
-       SAMTOOLS_FLAGSTAT(input, prep_intervals)
+        // RUN SAMTOOLS FLAGSTAT
+        SAMTOOLS_FLAGSTAT(input, prep_intervals)
+ 
+        // Gather all reports generated
+        impact_qc_reports = impact_qc_reports.mix(SAMTOOLS_FLAGSTAT.out.flagstat)
+ 
+        // Gather versions of all tools used
+        versions = versions.mix(SAMTOOLS_FLAGSTAT.out.versions)
+ 
+        // Custom report
+        flagstat_report = SAMTOOLS_FLAGSTAT.out.flagstat
 
-       // Gather all reports generated
-       impact_qc_reports = impact_qc_reports.mix(SAMTOOLS_FLAGSTAT.out.flagstat)
+        // RUN FLAGSTAT CUSTOM
+        FLAGSTATCUSTOM(flagstat_report)
 
-       // Gather versions of all tools used
-       versions = versions.mix(SAMTOOLS_FLAGSTAT.out.versions) 
+        // Gather MultiQC custom file
+        impact_qc_reports = impact_qc_reports.mix(FLAGSTATCUSTOM.out.mqc_paired_reads_diff_chr_mapq5_pct)
+
     }
 
     // SEX DETERMINATION
@@ -290,6 +312,11 @@ workflow IMPACT_QC {
         
             // Gather all reports generated
             impact_qc_reports = impact_qc_reports.mix(VCFTOOLSCUSTOM.out.distribution)
+
+            // Not plot DP distribution in MultiQC if 'plotdp' is in tools
+            if (params.tools && params.tools.split(',').contains('plotdp')) {
+                impact_qc_reports = impact_qc_reports.mix(VCFTOOLSCUSTOM.out.mqc_dp_distribution)
+            }
 
             // Not plot GQ distribution in MultiQC if 'plotgq' is in tools
             if (params.tools && params.tools.split(',').contains('plotgq')) {

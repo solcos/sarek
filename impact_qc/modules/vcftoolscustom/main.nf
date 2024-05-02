@@ -15,6 +15,7 @@ process VCFTOOLSCUSTOM {
    
     output:
     tuple val(meta), path("*.{FORMAT,INFO}")                                , emit: distribution
+    tuple val(meta), path("*_DP_distribution_mqc.txt")                      , emit: mqc_dp_distribution
     tuple val(meta), path("*_GQ_distribution_mqc.txt")                      , emit: mqc_gq_distribution
     tuple val(meta), path("*_{SP,SRP-SAP-EPP,FS,SB}_distribution_mqc.txt")  , emit: mqc_sb_distribution
     
@@ -48,7 +49,14 @@ process VCFTOOLSCUSTOM {
 
     """
     id="${prefix}"
-    
+
+    ## DP distribution
+    vcftools \\
+            $input_file \\
+            --out $prefix \\
+            --extract-FORMAT-info DP \\
+            $args
+
     ## GQ distribution
     vcftools \\
             $input_file \\
@@ -239,7 +247,31 @@ process VCFTOOLSCUSTOM {
         echo "WARNING \${id}: There is no 'strand bias' distribution for the variant caller selected"
     fi
 
-    # Prepare files for MultiQC report (only GQ distribution) 
+    ## Prepare files for MultiQC report (DP and GQ distribution) 
+
+    # DP distribution
+    cut -f3 *DP.FORMAT | tail -n +2 > tmp.txt
+    sed -i "1s/^/\${sample}\\n/" tmp.txt
+    sed -i "1s/^/Sample\\n/" tmp.txt
+    sed -i 's/\$/,/g' tmp.txt
+
+    # Transpose the table to match the MultiQC configuration
+    n_cols=\$(head -1 tmp.txt | wc -w)
+    for i in \$(seq 1 "\$n_cols"); do
+        echo \$(cut -d ' ' -f "\$i" tmp.txt)
+    done > \${sample}_DP_distribution_mqc.txt
+
+    # Edit file to achive the desired configuration for MultiQC
+    sed -i 's/, /,/g' \${sample}_DP_distribution_mqc.txt
+    sed -i 's/,\$//g' \${sample}_DP_distribution_mqc.txt
+    sed -i 's/Sample,/Sample /g' \${sample}_DP_distribution_mqc.txt
+ 
+    # MultiQC plot type
+    sed -i "1s/^/# plot_type: 'linegraph'\\n/" \${sample}_DP_distribution_mqc.txt
+
+    # Remove temporary file
+    rm tmp.txt
+
     # GQ distribution
     cut -f3 *GQ.FORMAT | tail -n +2 > tmp.txt
     sed -i "1s/^/\${sample}\\n/" tmp.txt

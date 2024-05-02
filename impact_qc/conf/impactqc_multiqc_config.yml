@@ -91,7 +91,7 @@ table_columns_visible:
     mapped_passed_pct: False
   mosdepth:
     1_x_pc: True
-    8_x_pc: False
+    8_x_pc: True
     10_x_pc: True
     20_x_pc: True
     30_x_pc: True
@@ -180,7 +180,7 @@ table_columns_placement:
     N_READS_BEFORE: 1005
     N_READS_AFTER: 1006
     PCT_PASSED_READS: 1007
-    PCT_FAILED_READS: 1008
+    PCT_FILTERED_READS: 1008
   Custom content:
     RATIO_HET-HOM: 1080
     N_MULTIALLELIC_VARIANTS: 1081
