@@ -28,7 +28,7 @@ For all these reasons, IMPaCT-Data decided to use this existing workflow and imp
 
 ## Usage
 
-Follow these instructions from Sarek, [this](https://github.com/nf-core/sarek/tree/master#usage) and [this](https://github.com/solcos/sarek/tree/master/docs/usage.md), and from IMPaCT QC subworkflow, follow [this](https://github.com/solcos/sarek/tree/master/docs/usage.md).
+Follow these instructions from Sarek, [usage](https://github.com/nf-core/sarek/tree/master#usage) and [usage.md](https://github.com/solcos/sarek/tree/master/docs/usage.md), and from IMPaCT QC subworkflow, follow [usage.md](https://github.com/solcos/sarek/blob/master/impact_qc/docs/usage.md).
 
 ## Pipeline output
 
