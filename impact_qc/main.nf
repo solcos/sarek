@@ -20,9 +20,8 @@
 // Add to 'nextflow_schema.json' tools pattern: "plotallelicreadpct|plotdp|plotgq|plotsb"
 // Add to 'nextflow_schema.json' skip tools pattern: "bcftoolscustom|bcftoolsstats|collectinsertsizemetrics|collecthsmetrics|fastqscreen|fastpstats|flagstat|impactqc|sexdeterrmine|somalier|vcftoolscustom"
 
-// Add to FastQC module 'main.nf' before 'fastqc' command:
-//# Activate kmer module
-//sed -i "5s:1:0:g" /usr/local/opt/fastqc-0.12.1/Configuration/limits.txt
+// Add to FastQC module to activate kmer module
+// Add 'limits.txt' file to FASTQC module
 
 // Add sites path to 'igenomes.config' in the differents reference genomes (specify the version)
 // somalier_sites = "${projectDir}/impact_qc/assets/sites/sites.{version}.vcf.gz"
