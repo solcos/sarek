@@ -31,13 +31,13 @@ process FASTQSCREEN {
         [ ! -f  ${prefix}.fastq.gz ] && ln -sf $reads ${prefix}.fastq.gz
 
         # Put the conf file to the correct folder
-        cp fastq_screen.conf /usr/local/share/fastq-screen-0.15.2-0/fastq_screen.conf
+        #cp fastq_screen.conf /usr/local/share/fastq-screen-0.15.2-0/fastq_screen.conf
 
         # Put the databases to the root folder in order to be used and be the same as in the conf file
-        cp *bt* /.
+        #cp *bt* /.
 
         # Exctract which aligner is in the conf file
-        aligner_conf=\$(cat /usr/local/share/fastq-screen-0.15.2-0/fastq_screen.conf | grep BOWTIE2 | cut -c1)
+        aligner_conf=\$(cat fastq_screen.conf | grep BOWTIE2 | cut -c1)
 
         # Create aligner tool variable
         if [ "\$aligner_conf" = "#" ]; then
@@ -48,6 +48,7 @@ process FASTQSCREEN {
 
         # Execute fastq_screen
         fastq_screen \\
+            --conf fastq_screen.conf \\
             --force \\
             --aligner \${aligner_tool} \\
             --threads $task.cpus \\
@@ -65,13 +66,13 @@ process FASTQSCREEN {
         [ ! -f  ${prefix}_2.fastq.gz ] && ln -sf ${reads[1]} ${prefix}_2.fastq.gz
 
         # Put the conf file to the correct folder
-        cp fastq_screen.conf /usr/local/share/fastq-screen-0.15.2-0/fastq_screen.conf
+        #cp fastq_screen.conf /usr/local/share/fastq-screen-0.15.2-0/fastq_screen.conf
         
         # Put the databases to the root folder in order to be used and be the same as in the conf file
-        cp *bt* /.
+        #cp *bt* /.
  
         # Exctract which aligner is in the conf file
-        aligner_conf=\$(cat /usr/local/share/fastq-screen-0.15.2-0/fastq_screen.conf | grep BOWTIE2 | cut -c1)
+        aligner_conf=\$(cat fastq_screen.conf | grep BOWTIE2 | cut -c1)
 
         # Create aligner tool variable
         if [ "\$aligner_conf" = "#" ]; then
@@ -82,6 +83,7 @@ process FASTQSCREEN {
 
         # Execute fastq_screen
         fastq_screen \\
+            --conf fastq_screen.conf \\
             --force \\
             --aligner \${aligner_tool} \\
             --threads $task.cpus \\

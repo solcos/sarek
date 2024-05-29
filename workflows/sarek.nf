@@ -234,12 +234,13 @@ include { MULTIQC                                     } from '../modules/nf-core
 
 
 // IMPACT QC
+
+// Workflow
 include { IMPACT_QC                                 } from '../impact_qc/main'
 
-
-
-
-
+// FASTQ_SCREEN
+params.limits_fastqc    = "${projectDir}/impact_qc/assets/limits_fastqc.txt"
+limits_fastqc           = params.limits_fastqc ? Channel.fromPath(params.limits_fastqc, checkIfExists: true).collect()     : Channel.empty()
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -429,7 +430,7 @@ workflow SAREK {
 
         // QC
         if (!(params.skip_tools && params.skip_tools.split(',').contains('fastqc'))) {
-            FASTQC(input_fastq)
+            FASTQC(input_fastq, limits_fastqc)
 
             reports = reports.mix(FASTQC.out.zip.collect{ meta, logs -> logs })
             versions = versions.mix(FASTQC.out.versions.first())

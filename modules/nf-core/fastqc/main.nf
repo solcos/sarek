@@ -9,6 +9,7 @@ process FASTQC {
 
     input:
     tuple val(meta), path(reads)
+    path limits
 
     output:
     tuple val(meta), path("*.html"), emit: html
@@ -31,10 +32,12 @@ process FASTQC {
     done
 
     # Activate kmer module (IMPaCT QC)
-    sed -i "5s:1:0:g" /usr/local/opt/fastqc-0.12.1/Configuration/limits.txt
+    #sed -i "5s:1:0:g" /usr/local/opt/fastqc-0.12.1/Configuration/limits.txt
+    #cp /usr/local/opt/fastqc-0.12.1/Configuration/limits.txt .
 
     fastqc \\
         $args \\
+        --limits $limits \\
         --threads $task.cpus \\
         $renamed_files
 

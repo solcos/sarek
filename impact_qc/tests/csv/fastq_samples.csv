@@ -1,0 +1,3 @@
+patient,sample,lane,fastq_1,fastq_2
+TESTX,TEST1,1,./impact_qc/tests/samples/TESTX/TESTX_H7YRLADXX_S1_L00ALL_R1_001.fastq.gz,./impact_qc/tests/samples/TESTX/TESTX_H7YRLADXX_S1_L00ALL_R2_001.fastq.gz
+TESTY,TEST2,1,./impact_qc/tests/samples/TESTY/TESTY_H7YRLADXX_S1_L00ALL_R1_001.fastq.gz,./impact_qc/tests/samples/TESTY/TESTY_H7YRLADXX_S1_L00ALL_R2_001.fastq.gz

@@ -1,0 +1,3 @@
+patient,sample,lane,bam,bai
+TESTX,TEST1,1,./impact_qc/tests/samples/TESTX/TESTX.bam,./impact_qc/tests/samples/TESTX/TESTX.bam.bai
+TESTY,TEST2,2,./impact_qc/tests/samples/TESTY/TESTY.bam,./impact_qc/tests/samples/TESTY/TESTY.bam.bai

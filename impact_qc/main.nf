@@ -35,15 +35,15 @@
 
 // PICARD INTERVALS
 params.bait_intervals          = ""
-bait_intervals                 = params.bait_intervals     ? Channel.fromPath(params.bait_intervals, checkIfExists: true).collect()     : Channel.empty()
+bait_intervals                 = params.bait_intervals     ? Channel.fromPath(params.bait_intervals, checkIfExists: true).collect()             : Channel.empty()
 params.amplicon_intervals      = ""
-amplicon_intervals             = params.amplicon_intervals ? Channel.fromPath(params.amplicon_intervals, checkIfExists: true).collect() : Channel.empty()
+amplicon_intervals             = params.amplicon_intervals ? Channel.fromPath(params.amplicon_intervals, checkIfExists: true).collect()         : Channel.empty()
 params.target_intervals        = ""
-target_intervals               = params.target_intervals   ? Channel.fromPath(params.target_intervals, checkIfExists: true).collect()   : Channel.empty()
+target_intervals               = params.target_intervals   ? Channel.fromPath(params.target_intervals, checkIfExists: true).collect()           : Channel.empty()
 hsmetrics_intervals            = bait_intervals.combine(target_intervals)
  
 // SOMALIER
-somalier_sites                 = params.somalier_sites     ? Channel.fromPath(params.somalier_sites, checkIfExists: true).collect()     : Channel.empty()
+somalier_sites                 = params.somalier_sites     ? Channel.fromPath(params.somalier_sites, checkIfExists: true).collect()             : Channel.empty()
 
 // FASTQ_SCREEN
 params.fastq_screen_conf_db    = "${projectDir}/impact_qc/assets/fastq_screen_conf_db/**"
